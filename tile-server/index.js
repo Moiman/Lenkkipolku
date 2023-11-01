@@ -1,10 +1,12 @@
 import express from "express";
+import cors from "cors";
 import MBTiles from "@mapbox/mbtiles";
 import { requestLog, unknownEndpoint } from "./middleware.js";
 
 const app = express();
 
 app.use(requestLog);
+app.use(cors())
 app.use(express.static("public"));
 
 // Enable CORS and set correct mime type/content encoding
