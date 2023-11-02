@@ -11,8 +11,8 @@ app.use(express.static("public"));
 
 // Enable CORS and set correct mime type/content encoding
 var header = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+  // "Access-Control-Allow-Origin": "*",
+  // "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
   "Content-Type": "application/x-protobuf",
   "Content-Encoding": "gzip"
 };
