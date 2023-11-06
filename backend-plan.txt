@@ -1,0 +1,77 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table users {
+  id integer [primary key]
+  username varchar [not null, unique]
+  password varchar [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table paths {
+  id integer [primary key]
+  title varchar [not null]
+  path jsonb [not null]
+  user_id integer [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Ref: paths.user_id > users.id // many-to-one
+
+
+jwt token contains as payload:
+user_id: <number>
+
+Backend API:
+POST /users/register
+Receives username and password
+Creates new user
+Returns jwt token and refresh token
+
+POST /users/login
+Receives username and password
+Checks if username and password matches data in database
+Returns jwt token and refresh token
+
+GET /users/refresh
+Receives refresh token
+Keeps users logged in if jwt token expires
+Returns jwt token and new refresh token
+
+PUT /users/:id
+Receives password
+checks if jwt token and id matches and then
+updates user password and updated_at fields
+Returns user with id
+
+DELETE /users/:id
+checks if jwt token and id matches and then
+deletes user and paths with user_id
+Returns id of deleted user
+
+
+/paths require authentication based on jwt tokens.
+
+GET /paths
+Gets all paths for one user based on jwt token
+Return list of paths with id, title, updated_at
+
+GET /paths/:id
+Gets path with id
+Returns path
+
+POST /paths
+Receives title, path and user_id from jwt token
+Creates new path
+Returns created path
+
+PUT /paths/:id
+Receives path or title
+Updates (title or path) and updated_at fields in database
+Returns path
+
+DELETE /paths/:id
+Deletes path with id
+Returns the id of deleted path

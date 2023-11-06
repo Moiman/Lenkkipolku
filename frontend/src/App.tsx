@@ -8,7 +8,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./App.css";
 
 
-const geojson: FeatureCollection<Point | LineString>   = {
+const geojson: FeatureCollection<Point | LineString> = {
   type: "FeatureCollection",
   features: [
     // { type: "Feature", geometry: { type: "LineString", coordinates: [[23.7685, 61.4961], [23.7785, 61.4661]] } }
