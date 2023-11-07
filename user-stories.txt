@@ -1,0 +1,13 @@
+I want to plan my running path before running, so I don't run circles, discover new paths or run too far.
+
+I want to measure lenght of my running path, so I could better plan time needed for running
+
+I want to save my path, so I could view it later
+
+I want to edit my path, so I could improve my path
+
+I want to remove my path, so old paths don't clutter my list
+
+I want organize my path list, so I can see most important path first.
+
+I want to delete all my data, so I can keep my privacy
