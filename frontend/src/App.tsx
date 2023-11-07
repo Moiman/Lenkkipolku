@@ -10,39 +10,41 @@ import "./App.css";
 
 const geojson: FeatureCollection<Point | LineString> = {
   type: "FeatureCollection",
-  features: [
-    // { type: "Feature", geometry: { type: "LineString", coordinates: [[23.7685, 61.4961], [23.7785, 61.4661]] } }
-  ]
+  features: []
 };
 
+const pointsLayerStyle: CircleLayer = {
+  id: "my-points",
+  type: "circle",
+  source: "geojson",
+  paint: {
+    "circle-radius": 5,
+    "circle-color": "#ffffff",
+    "circle-stroke-color": "#000000",
+    "circle-stroke-width": 2
+  },
+  filter: ["in", "$type", "Point"],
+};
+
+const linesLayerStyle: LineLayer = {
+  id: "my-lines",
+  type: "line",
+  source: "geojson",
+  layout: {
+    "line-cap": "round",
+    "line-join": "round"
+  },
+  paint: {
+    "line-color": "#000",
+    "line-width": 2.5
+  },
+  filter: ["in", "$type", "LineString"]
+};
+
+
 const App = () => {
+  const [cursor, setCursor] = useState("auto");
   const [distance, setDistance] = useState(0);
-
-  const pointsLayerStyle: CircleLayer = {
-    id: "my-points",
-    type: "circle",
-    source: "geojson",
-    paint: {
-      "circle-radius": 5,
-      "circle-color": "#000"
-    },
-    filter: ["in", "$type", "Point"],
-  };
-
-  const linesLayerStyle: LineLayer = {
-    id: "my-lines",
-    type: "line",
-    source: "geojson",
-    layout: {
-      "line-cap": "round",
-      "line-join": "round"
-    },
-    paint: {
-      "line-color": "#000",
-      "line-width": 2.5
-    },
-    filter: ["in", "$type", "LineString"]
-  };
 
   const mapRef = useRef<MapRef>(null);
 
@@ -52,22 +54,47 @@ const App = () => {
     zoom: 11,
   });
 
+  const handleMouseMove = (e: MapLayerMouseEvent) => {
+    const features = e.target.queryRenderedFeatures(e.point, {
+      layers: ["my-points"]
+    });
+    setCursor(
+      features.length
+        ? "pointer"
+        : "crosshair"
+    );
+  };
+
   const handleClick = (e: MapLayerMouseEvent) => {
+    const features = e.target.queryRenderedFeatures(e.point, {
+      layers: ["my-points"]
+    });
+    console.log(features);
+
     // Remove lineString
     if (geojson.features.length > 1) geojson.features.pop();
 
-    const point: Feature<Point> = {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [e.lngLat.lng, e.lngLat.lat],
-      },
-      "properties": {
-        "id": String(new Date().getTime())
-      }
-    };
+    if (features.length) {
+      const id = features[0].properties.id as Date;
+      geojson.features = geojson.features.filter((point) => {
+        return point.properties?.id !== id;
+      });
+    } else {
 
-    geojson.features.push(point);
+      const point: Feature<Point> = {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [e.lngLat.lng, e.lngLat.lat],
+        },
+        "properties": {
+          "id": String(new Date().getTime())
+        }
+      };
+
+
+      geojson.features.push(point);
+    }
 
     const lineString: Feature<LineString> = {
       "type": "Feature",
@@ -87,7 +114,6 @@ const App = () => {
     }
     setDistance(turf.length(lineString));
     (mapRef.current?.getSource("geojson") as GeoJSONSource).setData(geojson);
-    // console.log(geojson);
   };
 
   return (
@@ -96,17 +122,13 @@ const App = () => {
         {...viewState}
         ref={mapRef}
         onMove={e => { setViewState(e.viewState); }}
+        onMouseMove={handleMouseMove}
         onClick={handleClick}
+        cursor={cursor}
         maxBounds={[[23.446809, 61.332591], [24.090196, 61.599578]]}
-        minZoom={8}
-        // maxZoom={14}
-        style={{
-          // width: "100%", height: "100%"
-        }}
         mapStyle="http://localhost:8081/style.json"
       >
         <NavigationControl />
-        {/* <Marker longitude={23.7685} latitude={61.4661} color="red" /> */}
         <Source id="geojson" type="geojson" data={geojson}>
           <Layer {...linesLayerStyle} />
           <Layer {...pointsLayerStyle} />
