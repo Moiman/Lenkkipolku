@@ -19,7 +19,7 @@ const pointsLayerStyle: CircleLayer = {
   source: "geojson",
   paint: {
     "circle-radius": 5,
-    "circle-color": "#ffffff",
+    "circle-color": ["get", "color"],
     "circle-stroke-color": "#000000",
     "circle-stroke-width": 2
   },
@@ -54,49 +54,24 @@ const App = () => {
     zoom: 11,
   });
 
-  const handleMouseMove = (e: MapLayerMouseEvent) => {
-    const features = e.target.queryRenderedFeatures(e.point, {
-      layers: ["my-points"]
+  const reDrawLine = () => {
+    //Remove existing paths
+    geojson.features = geojson.features.filter(feature => feature.geometry.type !== "LineString");
+
+    // Color first point green and last red
+    geojson.features.forEach((f, i) => {
+      let color = "white";
+      if (i === 0) {
+        color = "green";
+      } else if (i === geojson.features.length - 1) {
+        color = "red";
+      }
+      if (f.properties) {
+        f.properties.color = color;
+      }
     });
-    setCursor(
-      features.length
-        ? "pointer"
-        : "crosshair"
-    );
-  };
 
-  const handleClick = (e: MapLayerMouseEvent) => {
-    const features = e.target.queryRenderedFeatures(e.point, {
-      layers: ["my-points"]
-    });
-    console.log(features);
-
-    // Remove lineString
-    if (geojson.features.length > 1) geojson.features.pop();
-
-    if (features.length) {
-      const id = features[0].properties.id as Date;
-      geojson.features = geojson.features.filter((point) => {
-        return point.properties?.id !== id;
-      });
-    } else {
-
-      const point: Feature<Point> = {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [e.lngLat.lng, e.lngLat.lat],
-        },
-        "properties": {
-          "id": String(new Date().getTime())
-        }
-      };
-
-
-      geojson.features.push(point);
-    }
-
-    const lineString: Feature<LineString> = {
+    const newPath: Feature<LineString> = {
       "type": "Feature",
       "geometry": {
         "type": "LineString",
@@ -107,13 +82,86 @@ const App = () => {
       }
     };
 
-    // const points = geojson.features.filter((feature) => feature.geometry.type === "Point");
     if (geojson.features.length > 1) {
-      lineString.geometry.coordinates = geojson.features.map((point) => point.geometry.coordinates as Position);
-      geojson.features.push(lineString);
+      newPath.geometry.coordinates = geojson.features.map((point) => point.geometry.coordinates as Position);
+      geojson.features.push(newPath);
     }
-    setDistance(turf.length(lineString));
-    (mapRef.current?.getSource("geojson") as GeoJSONSource).setData(geojson);
+    setDistance(turf.length(newPath));
+  };
+
+
+  const handleMouseMove = (e: MapLayerMouseEvent) => {
+    const features = e.features;
+    // .target.queryRenderedFeatures(e.point, {
+    //   layers: ["my-points"]
+    // });
+    setCursor(
+      features?.length
+        ? "pointer"
+        : "crosshair"
+    );
+  };
+
+  const handleRightClick = (e: MapLayerMouseEvent) => {
+    const features = e.features;
+    // const features = e.target.queryRenderedFeatures(e.point, {
+    //   layers: ["my-points"]
+    // });
+
+    if (features?.length) {
+      const pointsToRemove = features.map(f => f.properties.id as Date);
+      geojson.features = geojson.features.filter((point) => {
+        return !pointsToRemove.includes(point.properties?.id as Date);
+      });
+
+      reDrawLine();
+      (e.target.getSource("geojson") as GeoJSONSource).setData(geojson);
+    }
+
+  };
+
+  const handleClick = (e: MapLayerMouseEvent) => {
+    const newPoint: Feature<Point> = {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [e.lngLat.lng, e.lngLat.lat],
+      },
+      "properties": {
+        "id": String(new Date().getTime()),
+        "color": "white"
+      }
+    };
+
+    geojson.features.push(newPoint);
+
+    reDrawLine();
+    (e.target.getSource("geojson") as GeoJSONSource).setData(geojson);
+  };
+
+
+  const handleMouseDown = (e: MapLayerMouseEvent) => {
+    //Ignore if right click
+    if (e.originalEvent.button === 2) {
+      return;
+    }
+    if (e.features?.length) {
+      e.preventDefault();
+      const pointToMove = e.features[0];
+      const pointToMoveIndex = geojson.features.findIndex(p => p.properties?.id === pointToMove.properties.id);
+      const onPointMove = (ev: MapLayerMouseEvent) => {
+        setCursor("grabbing");
+        geojson.features[pointToMoveIndex].geometry.coordinates = [ev.lngLat.lng, ev.lngLat.lat];
+        reDrawLine();
+        (e.target.getSource("geojson") as GeoJSONSource).setData(geojson);
+      };
+
+      setCursor("grab");
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      e.target
+        .on("mousemove", onPointMove)
+        .once("mouseup", (e) => e.target.off("mousemove", onPointMove));
+    }
   };
 
   return (
@@ -124,6 +172,9 @@ const App = () => {
         onMove={e => { setViewState(e.viewState); }}
         onMouseMove={handleMouseMove}
         onClick={handleClick}
+        onContextMenu={handleRightClick}
+        onMouseDown={handleMouseDown}
+        interactiveLayerIds={["my-points"]}
         cursor={cursor}
         maxBounds={[[23.446809, 61.332591], [24.090196, 61.599578]]}
         mapStyle="http://localhost:8081/style.json"
