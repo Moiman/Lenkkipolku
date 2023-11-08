@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    // "noImplicitAny": true,
+    "noImplicitAny": true,
     "strictNullChecks": true,
-    // "strict": true,
+    "strict": true,
     "esModuleInterop": true,
     "module": "Node16",
     "target": "ES2022",
