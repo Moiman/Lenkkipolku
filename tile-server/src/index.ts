@@ -6,13 +6,10 @@ import { requestLog, unknownEndpoint } from "./middleware.js";
 const app = express();
 
 app.use(requestLog);
-app.use(cors())
+app.use(cors());
 app.use(express.static("public"));
 
-// Enable CORS and set correct mime type/content encoding
-var header = {
-  // "Access-Control-Allow-Origin": "*",
-  // "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+const header = {
   "Content-Type": "application/x-protobuf",
   "Content-Encoding": "gzip"
 };
