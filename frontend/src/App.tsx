@@ -45,14 +45,13 @@ const linesLayerStyle: LineLayer = {
 const App = () => {
   const [cursor, setCursor] = useState("auto");
   const [distance, setDistance] = useState(0);
-
-  const mapRef = useRef<MapRef>(null);
-
   const [viewState, setViewState] = useState({
     longitude: 23.7685,
     latitude: 61.4661,
     zoom: 11,
   });
+
+  const mapRef = useRef<MapRef>(null);
 
   const reDrawLine = () => {
     //Remove existing paths
@@ -92,9 +91,6 @@ const App = () => {
 
   const handleMouseMove = (e: MapLayerMouseEvent) => {
     const features = e.features;
-    // .target.queryRenderedFeatures(e.point, {
-    //   layers: ["my-points"]
-    // });
     setCursor(
       features?.length
         ? "pointer"
@@ -104,9 +100,6 @@ const App = () => {
 
   const handleRightClick = (e: MapLayerMouseEvent) => {
     const features = e.features;
-    // const features = e.target.queryRenderedFeatures(e.point, {
-    //   layers: ["my-points"]
-    // });
 
     if (features?.length) {
       const pointsToRemove = features.map(f => f.properties.id as Date);
