@@ -6,34 +6,43 @@ import * as dao from "./usersDao.js";
 const router = express.Router();
 
 const secret = process.env.SECRET!;
+const refreshSecret = process.env.REFRESH_SECRET!;
 
-router.get("/", async (req, res) => {
-  const result = await dao.findAllUsers();
-  res.json(result.rows);
+router.get("/", async (_req, res) => {
+  try {
+    const users = await dao.findAllUsers();
+    res.json(users);
+    return;
+  } catch (err) {
+    res.status(500).end();
+    return;
+  }
 });
 
 router.post("/register", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  if (!username || !password) {
+  if (!username
+    || !password
+    || typeof username !== "string"
+    || typeof password !== "string") {
     return res.status(400).json({ error: "Missing username or password" });
   }
 
   try {
     const findUser = await dao.findUserWithUsername(username);
-    if (findUser.rowCount! > 0) {
+    if (findUser) {
       return res.status(409).json({ error: "Username already exists" });
     }
     const hash = await argon2.hash(password);
-    const user = { username: username, password: hash };
 
-    await dao.insertUser(user);
+    const newUser = await dao.insertUser(username, hash);
 
-    const payload = { username: username };
+    const payload = { id: newUser.id };
     const options = { expiresIn: "15m" };
     const token = jwt.sign(payload, secret, options);
-    const refreshToken = jwt.sign(payload, secret, { expiresIn: "7d" });
+    const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "7d" });
 
     return res.status(200).json({ token, refreshToken });
   } catch (err) {
@@ -46,20 +55,21 @@ router.post("/login", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  if (!username || !password) {
+  if (!username || !password || typeof username !== "string" || typeof password !== "string") {
     return res.status(400).json({ error: "Missing username or password" });
   }
 
   try {
     const findUser = await dao.findUserWithUsername(username);
-    if (findUser.rowCount! > 0 && await argon2.verify(findUser.rows[0].password, password)) {
-      const payload = { username: username };
+    if (findUser && await argon2.verify(findUser.password, password)) {
+      const payload = { id: findUser.id };
       const options = { expiresIn: "15m" };
       const token = jwt.sign(payload, secret, options);
-      const refreshToken = jwt.sign(payload, secret, { expiresIn: "7d" });
+      const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "7d" });
 
       return res.status(200).json({ token, refreshToken });
-
+    } else {
+      return res.status(401).end();
     }
   } catch (err) {
     console.error(err);
@@ -74,21 +84,21 @@ router.get("/refresh", async (req, res) => {
   }
   const token = auth.substring(7);
   try {
-    const decodedToken = jwt.verify(token, secret);
+    const decodedToken = jwt.verify(token, refreshSecret);
 
     if (typeof decodedToken === "string") {
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    const user = await dao.findUserWithUsername(decodedToken.username);
-    if (user.rowCount! > 0) {
-      return res.status(401).json({ error: "Invalid token, no such username" });
+    const user = await dao.findOneUser(decodedToken.id);
+    if (!user) {
+      return res.status(401).json({ error: "Invalid token, no such user" });
     }
 
-    const payload = { username: decodedToken.username };
+    const payload = { id: decodedToken.id };
     const options = { expiresIn: "15m" };
     const newToken = jwt.sign(payload, secret, options);
-    const refreshToken = jwt.sign(payload, secret, { expiresIn: "7d" });
+    const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "7d" });
 
     return res.status(200).json({ token: newToken, refreshToken });
   } catch (error) {

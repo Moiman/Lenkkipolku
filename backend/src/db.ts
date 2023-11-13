@@ -11,7 +11,7 @@ const pool = new pg.Pool({
   database: PG_DATABASE,
 });
 
-const executeQuery = async (query: string, parameters?: Array<unknown>) => {
+const executeQuery = async (query: string, parameters?: unknown[]) => {
   const client = await pool.connect();
   try {
     const result = await client.query(query, parameters);
@@ -32,7 +32,6 @@ const executeQuery = async (query: string, parameters?: Array<unknown>) => {
 
 const createUsersTable = async () => {
   await executeQuery(createUsersTableQuery);
-  console.log("Users table initialized");
 };
 
-export { createUsersTable, executeQuery };
+export { createUsersTable, executeQuery, pool };
