@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import Map, { Source, Layer, NavigationControl } from "react-map-gl/maplibre";
 import * as turf from "@turf/turf";
-import Distance from "./Distance";
 import type { LineLayer, MapLayerMouseEvent, MapRef, CircleLayer, GeoJSONSource } from "react-map-gl/maplibre";
 import type { FeatureCollection, Point, LineString, Feature, Position } from "geojson";
+import Distance from "./Distance";
+import User from "./User";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./App.css";
 
@@ -179,6 +180,7 @@ const App = () => {
         </Source>
       </Map>
       <Distance distance={distance} />
+      <User />
     </>
   );
 };
