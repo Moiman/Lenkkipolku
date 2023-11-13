@@ -1,29 +1,40 @@
-import React, { useState } from "react";
-import { Container } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
+import { Button, Container, Form, Modal } from "react-bootstrap";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+
+
+interface Inputs {
+  username: string;
+  password: string;
+  confirmPassword: string;
+}
 
 const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
-  const initialState = { username: "", password: "", rePassword: "" };
-  const [formsInputs, setFormsInputs] = useState(initialState);
+  const validationSchema = Yup.object({
+    username: Yup.string()
+      .required("Username is required")
+      .min(1, "Username must be at least 1 characters")
+      .max(20, "Username must not exceed 20 characters"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters")
+      .max(40, "Password must not exceed 40 characters"),
+    confirmPassword: Yup.string()
+      .required("Confirm Password is required")
+      .oneOf([Yup.ref("password")], "Confirm Password does not match"),
+  });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setFormsInputs({ ...formsInputs, [name]: value });
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>(
+    { resolver: yupResolver(validationSchema) }
+  );
+  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
 
-  const handleForm = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log(formsInputs);
-    if (formsInputs.password !== formsInputs.rePassword) {
-      alert("moi");
-    } else {
-      closeModal();
-      setFormsInputs(initialState);
-    }
-  };
   return (
     <Modal
       show={isOpen}
@@ -32,40 +43,46 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
       <Modal.Body>
         <Modal.Header closeButton></Modal.Header>
         <Container>
-          <Form onSubmit={handleForm}>
+          <Form onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3">
               <Form.Label>Username</Form.Label>
               <Form.Control
+                {...register("username", { required: "Username is required" })}
+                isInvalid={!!errors.username}
                 type="text"
-                name="username"
-                value={formsInputs.username}
-                onChange={handleChange}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.username?.message}
+              </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control
+                {...register("password", { required: "Password is required", minLength: 8 })}
+                isInvalid={!!errors.password}
                 type="password"
-                name="password"
-                value={formsInputs.password}
-                onChange={handleChange}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.password?.message}
+              </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Retype password</Form.Label>
               <Form.Control
+                {...register("confirmPassword", { required: true })}
+                isInvalid={!!errors.confirmPassword}
                 type="password"
-                name="rePassword"
-                value={formsInputs.rePassword}
-                onChange={handleChange}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.confirmPassword?.message}
+              </Form.Control.Feedback>
             </Form.Group>
             <Button type="submit" className="me-1">
               Submit
             </Button>
             <Button type="reset"
               variant="outline-primary"
-              onClick={() => { setFormsInputs(initialState); }}
+              onClick={() => reset()}
             >
               Reset
             </Button>
