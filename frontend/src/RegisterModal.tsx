@@ -1,8 +1,10 @@
+import { isAxiosError } from "axios";
 import { Button, Container, Form, Modal } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-
+import userService from "./userService";
+import { useAuth } from "./AuthProvider";
 
 interface Inputs {
   username: string;
@@ -11,6 +13,8 @@ interface Inputs {
 }
 
 const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
+  const { setToken } = useAuth();
+
   const validationSchema = Yup.object({
     username: Yup.string()
       .required("Username is required")
@@ -29,11 +33,29 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<Inputs>(
     { resolver: yupResolver(validationSchema) }
   );
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    try {
+      const res = await userService.register(data);
+      console.log(res);
+      setToken(res.token);
+      closeModal();
+    } catch(err) {
+      if( isAxiosError(err)) {
+        if( err.response?.data.error) {
+          setError("username",  {
+            type: "server",
+            message: err.response?.data.error
+          });
+        }
+      }
+    }
+  };
 
   return (
     <Modal
@@ -47,7 +69,7 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
             <Form.Group className="mb-3">
               <Form.Label>Username</Form.Label>
               <Form.Control
-                {...register("username", { required: "Username is required" })}
+                {...register("username")}
                 isInvalid={!!errors.username}
                 type="text"
               />
@@ -58,7 +80,7 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control
-                {...register("password", { required: "Password is required", minLength: 8 })}
+                {...register("password")}
                 isInvalid={!!errors.password}
                 type="password"
               />
@@ -67,9 +89,9 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Retype password</Form.Label>
+              <Form.Label>Confirm password</Form.Label>
               <Form.Control
-                {...register("confirmPassword", { required: true })}
+                {...register("confirmPassword")}
                 isInvalid={!!errors.confirmPassword}
                 type="password"
               />

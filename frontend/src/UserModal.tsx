@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-
+import { useAuth } from "./AuthProvider";
 
 interface IProps {
   isOpen: boolean,
@@ -12,8 +12,8 @@ interface IProps {
   openLogin: () => void,
 }
 
-
 const UserModal = ({ isOpen, closeModal, openRegister, openLogin }: IProps) => {
+  const { token, setToken } = useAuth();
 
   const OpenRegisterModal = () => {
     openRegister();
@@ -25,7 +25,6 @@ const UserModal = ({ isOpen, closeModal, openRegister, openLogin }: IProps) => {
     closeModal();
   };
 
-
   return (
     <Modal
       show={isOpen}
@@ -35,18 +34,23 @@ const UserModal = ({ isOpen, closeModal, openRegister, openLogin }: IProps) => {
         <Modal.Header closeButton></Modal.Header>
         <Container className="d-flex justify-content-around mt-3">
           <Row className="justify-content-around">
-            <Col>
-              <Button onClick={OpenRegisterModal}>Register</Button>
-            </Col>
-            <Col>
-              <Button onClick={OpenLoginModal}>Login</Button>
-            </Col>
+            {token.length === 0
+              ? <>
+                <Col>
+                  <Button onClick={OpenRegisterModal}>Register</Button>
+                </Col>
+                <Col>
+                  <Button onClick={OpenLoginModal}>Login</Button>
+                </Col>
+              </>
+              : <><Col>
+                <Button onClick={() => setToken("")}>Logout</Button>
+              </Col></>
+            }
           </Row>
         </Container>
       </Modal.Body>
-
     </Modal>
-
   );
 };
 

@@ -1,23 +1,54 @@
-import React, { useState } from "react";
+import { isAxiosError } from "axios";
 import { Button, Container, Form, Modal } from "react-bootstrap";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import userService from "./userService";
+import { useAuth } from "./AuthProvider";
 
-const initialState = { username: "", password: "" };
+interface Inputs {
+  username: string;
+  password: string;
+}
 
 const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
-  const [formsInputs, setFormsInputs] = useState(initialState);
+  const { setToken } = useAuth();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setFormsInputs({ ...formsInputs, [name]: value });
+  const validationSchema = Yup.object({
+    username: Yup.string()
+      .required("Username is required"),
+    password: Yup.string()
+      .required("Password is required"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors },
+  } = useForm<Inputs>(
+    { resolver: yupResolver(validationSchema) }
+  );
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    try {
+      const res = await userService.login(data);
+      setToken(res.token);
+      console.log(res.token);
+      closeModal();
+    } catch (err) {
+      if (isAxiosError(err)) {
+        if (err.response?.data.error) {
+          setError("username", {
+            type: "server",
+            message: err.response?.data.error
+          });
+        }
+      }
+    }
   };
 
-  const handleForm = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log(formsInputs);
-    closeModal();
-    setFormsInputs(initialState);
-  };
   return (
     <Modal
       show={isOpen}
@@ -26,31 +57,35 @@ const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () =>
       <Modal.Body>
         <Modal.Header closeButton></Modal.Header>
         <Container>
-          <Form onSubmit={handleForm}>
+          <Form onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3">
               <Form.Label>Username</Form.Label>
               <Form.Control
+                {...register("username")}
+                isInvalid={!!errors.username}
                 type="text"
-                name="username"
-                value={formsInputs.username}
-                onChange={handleChange}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.username?.message}
+              </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control
+                {...register("password")}
+                isInvalid={!!errors.password}
                 type="password"
-                name="password"
-                value={formsInputs.password}
-                onChange={handleChange}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.password?.message}
+              </Form.Control.Feedback>
             </Form.Group>
             <Button type="submit" className="me-1">
               Submit
             </Button>
             <Button type="reset"
               variant="outline-primary"
-              onClick={() => { setFormsInputs(initialState); }}
+              onClick={() => reset()}
             >
               Reset
             </Button>

@@ -5,6 +5,7 @@ import type { LineLayer, MapLayerMouseEvent, MapRef, CircleLayer, GeoJSONSource 
 import type { FeatureCollection, Point, LineString, Feature, Position } from "geojson";
 import Distance from "./Distance";
 import User from "./User";
+import AuthProvider from "./AuthProvider";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./App.css";
 
@@ -159,7 +160,7 @@ const App = () => {
   };
 
   return (
-    <>
+    <AuthProvider>
       <Map
         {...viewState}
         ref={mapRef}
@@ -181,7 +182,7 @@ const App = () => {
       </Map>
       <Distance distance={distance} />
       <User />
-    </>
+    </AuthProvider>
   );
 };
 
