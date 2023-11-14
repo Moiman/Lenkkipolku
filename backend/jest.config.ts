@@ -1,4 +1,7 @@
 import type { JestConfigWithTsJest } from "ts-jest";
+import dotenv from "dotenv";
+
+dotenv.config({ path: ".env.test" });
 
 const jestConfig: JestConfigWithTsJest = {
   preset: "ts-jest/presets/default-esm",
@@ -7,7 +10,6 @@ const jestConfig: JestConfigWithTsJest = {
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  setupFiles: ["dotenv/config"],
   rootDir: "./tests",
 };
 

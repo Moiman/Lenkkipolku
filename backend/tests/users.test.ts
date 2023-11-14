@@ -137,7 +137,6 @@ describe("Server", () => {
       .expect(200)
       .expect("Content-Type", /json/);
     expect(() => jwt.verify(response.body.token, secret)).not.toThrow();
-    console.log(response.body.token);
     await request(server)
       .get("/users/refresh")
       .set("Authorization", "Bearer " + response.body.token)
