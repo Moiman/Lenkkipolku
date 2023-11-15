@@ -9,24 +9,16 @@ import { useAuth } from "./AuthProvider";
 interface Inputs {
   username: string;
   password: string;
-  confirmPassword: string;
 }
 
-const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
+const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
   const { setToken } = useAuth();
 
   const validationSchema = Yup.object({
     username: Yup.string()
-      .required("Username is required")
-      .min(1, "Username must be at least 1 characters")
-      .max(20, "Username must not exceed 20 characters"),
+      .required("Username is required"),
     password: Yup.string()
-      .required("Password is required")
-      .min(6, "Password must be at least 6 characters")
-      .max(40, "Password must not exceed 40 characters"),
-    confirmPassword: Yup.string()
-      .required("Confirm Password is required")
-      .oneOf([Yup.ref("password")], "Confirm Password does not match"),
+      .required("Password is required"),
   });
 
   const {
@@ -41,14 +33,17 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const res = await userService.register(data);
-      console.log(res);
-      setToken(res.token);
+      console.log("token1:", localStorage.getItem("token"));
+      const res = await userService.login(data);
+      console.log("token2:", localStorage.getItem("token"));
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("refreshToken", res.refreshToken);
       closeModal();
-    } catch(err) {
-      if( isAxiosError(err)) {
-        if( err.response?.data.error) {
-          setError("username",  {
+      reset();
+    } catch (err) {
+      if (isAxiosError(err)) {
+        if (err.response?.data.error) {
+          setError("username", {
             type: "server",
             message: err.response?.data.error
           });
@@ -88,17 +83,6 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
                 {errors.password?.message}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Confirm password</Form.Label>
-              <Form.Control
-                {...register("confirmPassword")}
-                isInvalid={!!errors.confirmPassword}
-                type="password"
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.confirmPassword?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
             <Button type="submit" className="me-1">
               Submit
             </Button>
@@ -115,4 +99,4 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
   );
 };
 
-export default RegisterModal;
+export default LoginModal;

@@ -2,7 +2,7 @@ import { useState } from "react";
 import UserModal from "./UserModal";
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
-import userSVG from "./assets/user.svg";
+import userSVG from "../assets/user.svg";
 import "./User.css";
 
 

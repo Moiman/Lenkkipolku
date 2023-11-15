@@ -4,8 +4,8 @@ import * as turf from "@turf/turf";
 import type { LineLayer, MapLayerMouseEvent, MapRef, CircleLayer, GeoJSONSource } from "react-map-gl/maplibre";
 import type { FeatureCollection, Point, LineString, Feature, Position } from "geojson";
 import Distance from "./Distance";
-import User from "./User";
-import AuthProvider from "./AuthProvider";
+import User from "./auth/User";
+import AuthProvider from "./auth/AuthProvider";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./App.css";
 

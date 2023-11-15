@@ -1,14 +1,18 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-interface  ContextType {
+interface ContextType {
   token: string,
   setToken: React.Dispatch<React.SetStateAction<string>>,
 }
 const AuthContext = createContext<ContextType>(null!);
 
 const AuthProvider = ({ children }: { children: React.ReactNode; }) => {
-  // const [authenticated, setAuthenticated] = useState(false);
+  const [authState, setAuthState] = useState({
+    accessToken: null,
+    refreshToken: null,
+    authenticated: null,
+  });
   const [token, setToken] = useState(localStorage.getItem("token") ?? "");
 
   useEffect(() => {
