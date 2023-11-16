@@ -1,5 +1,6 @@
 import pg from "pg";
-import { createUsersTableQuery } from "./userQueries.js";
+import { createUsersTableQuery } from "./users/usersQueries.js";
+import { createPathsTableQuery } from "./paths/pathsQueries.js";
 
 const { PG_HOST, PG_PORT, PG_USERNAME, PG_PASSWORD, PG_DATABASE } = process.env;
 
@@ -34,4 +35,8 @@ const createUsersTable = async () => {
   await executeQuery(createUsersTableQuery);
 };
 
-export { createUsersTable, executeQuery, pool };
+const createPathsTable = async () => {
+  await executeQuery(createPathsTableQuery);
+};
+
+export { createUsersTable, createPathsTable, executeQuery, pool };

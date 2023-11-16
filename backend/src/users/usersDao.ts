@@ -1,6 +1,6 @@
 // import { QueryResult } from "pg";
-import { executeQuery } from "./db.js";
-import * as queries from "./userQueries.js";
+import { executeQuery } from "../db.js";
+import * as queries from "./usersQueries.js";
 
 type User = undefined | {
   id: number,

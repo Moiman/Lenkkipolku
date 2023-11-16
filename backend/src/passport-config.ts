@@ -1,5 +1,5 @@
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import { findOneUser } from "./usersDao.js";
+import { findOneUser } from "./users/usersDao.js";
 import type { PassportStatic } from "passport";
 
 const opts = {
@@ -15,7 +15,6 @@ const passportConfig = (passport: PassportStatic) => {
       }
       findOneUser(jwt_payload.id)
         .then(user => {
-          console.log(user);
           if (user) {
             done(null, user);
           } else {

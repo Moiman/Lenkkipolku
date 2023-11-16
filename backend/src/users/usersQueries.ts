@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     "password" TEXT NOT NULL,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-)`;
+);`;
 
 const findAllUsers = "SELECT * FROM users ORDER BY id";
 

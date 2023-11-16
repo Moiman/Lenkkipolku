@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand",
     "build": "tsc --build",
     "start": "node dist/index.js",
     "dev": "nodemon -r dotenv/config src/index.ts"
