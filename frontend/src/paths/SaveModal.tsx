@@ -65,8 +65,8 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath }: IProp
             <Modal.Header closeButton>
               <Modal.Title>
                 {selectedPath
-                  ? <>Editing existing path: {selectedPath.title}</>
-                  : "Adding new path"
+                  ? <>Editing path: <b>{selectedPath.title}</b></>
+                  : "Unsaved path"
                 }
               </Modal.Title>
             </Modal.Header>
