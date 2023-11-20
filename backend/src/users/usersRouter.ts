@@ -2,10 +2,10 @@ import express from "express";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import * as dao from "./usersDao.js";
+import { createNewTokens } from "./tokenHelpers.js";
 
 const router = express.Router();
 
-const secret = process.env.SECRET!;
 const refreshSecret = process.env.REFRESH_SECRET!;
 
 router.get("/", async (_req, res) => {
@@ -39,12 +39,9 @@ router.post("/register", async (req, res) => {
 
     const newUser = await dao.insertUser(username, hash);
 
-    const payload = { id: newUser.id };
-    const options = { expiresIn: "15m" };
-    const token = jwt.sign(payload, secret, options);
-    const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "7d" });
+    const tokens = createNewTokens(newUser.id);
 
-    return res.status(200).json({ token, refreshToken });
+    return res.status(200).json(tokens);
   } catch (err) {
     console.error(err);
     return res.status(500).end();
@@ -62,14 +59,10 @@ router.post("/login", async (req, res) => {
   try {
     const findUser = await dao.findUserWithUsername(username);
     if (findUser && await argon2.verify(findUser.password, password)) {
-      const payload = { id: findUser.id };
-      const options = { expiresIn: "15m" };
-      const token = jwt.sign(payload, secret, options);
-      const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "7d" });
-
-      return res.status(200).json({ token, refreshToken });
+      const tokens = createNewTokens(findUser.id);
+      return res.status(200).json(tokens);
     } else {
-      return res.status(401).end();
+      return res.status(401).json({ error: "Username and password does not match" });
     }
   } catch (err) {
     console.error(err);
@@ -94,13 +87,8 @@ router.get("/refresh", async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: "Invalid token, no such user" });
     }
-
-    const payload = { id: decodedToken.id };
-    const options = { expiresIn: "15m" };
-    const newToken = jwt.sign(payload, secret, options);
-    const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "7d" });
-
-    return res.status(200).json({ token: newToken, refreshToken });
+    const tokens = createNewTokens(decodedToken.id);
+    return res.status(200).json(tokens);
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({ error: "Expired token" });

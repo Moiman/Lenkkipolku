@@ -3,8 +3,8 @@ POST http://localhost:3000/users/register
 Content-Type: application/json
 
 {
-  "username": "matti",
-  "password": "salainen"
+  "username": "a",
+  "password": "aaaaaa"
 }
 ###
 # @name login
@@ -12,8 +12,8 @@ POST http://localhost:3000/users/login
 Content-Type: application/json
 
 {
-  "username": "matti",
-  "password": "salainen"
+  "username": "a",
+  "password": "aaaaaa"
 }
 ###
 POST http://localhost:3000/users/login
@@ -24,6 +24,7 @@ Content-Type: application/json
   "password": "VÄÄRÄ"
 }
 ### Refresh token test
+# @name login
 GET http://localhost:3000/users/refresh
 Authorization: Bearer {{login.response.body.refreshToken}}
 ### Refresh token test with wrong token
@@ -34,3 +35,12 @@ GET http://localhost:3000/users/refresh
 ### Paths
 GET http://localhost:3000/paths
 Authorization: Bearer {{login.response.body.token}}
+### new path
+POST http://localhost:3000/paths
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "title": "polku2",
+  "path": [1]
+}
