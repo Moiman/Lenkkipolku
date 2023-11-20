@@ -10,22 +10,19 @@ const newPath = async (title: string, path: object) => {
   return res.data;
 };
 
-// const login = async (user: IUser) => {
-//   const res = await axios.post(baseUrl + "login", user);
-//   return res.data;
-// };
+const deletePath = async (id: number) => {
+  const res = await api.delete("paths/" + id);
+  return res.data;
+};
 
-// const refresh = async (refreshToken: string) => {
-//   const config = {
-//     headers: {
-//       Authorization: "Bearer " + refreshToken,
-//     }
-//   };
-//   const res = await axios.get(baseUrl + "refresh", config);
-//   return res.data;
-// };
+const updatePath = async (id: number, title: string, path: object) => {
+  const res = await api.put("paths/" + id, { title, path });
+  return res.data;
+};
 
 export default {
   getAll,
   newPath,
+  deletePath,
+  updatePath,
 };

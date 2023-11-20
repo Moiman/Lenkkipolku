@@ -1,24 +1,39 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Map, { Source, Layer, NavigationControl } from "react-map-gl/maplibre";
 import * as turf from "@turf/turf";
 import type { MapLayerMouseEvent, MapRef, GeoJSONSource } from "react-map-gl/maplibre";
 import type { Point, LineString, Feature, Position } from "geojson";
 import { pointsLayerStyle, linesLayerStyle } from "./mapStyle";
+import { IPath } from "../paths/pathsTypes";
 import { geojson } from "../App";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 
 interface IProps {
-  setDistance: React.Dispatch<React.SetStateAction<number>>;
+  setDistance: React.Dispatch<React.SetStateAction<number>>,
+  selectedPath: IPath | null,
 }
 
-const MapComponent = ({ setDistance }: IProps) => {
+const MapComponent = ({ setDistance, selectedPath }: IProps) => {
   const [cursor, setCursor] = useState("auto");
   const [viewState, setViewState] = useState({
     longitude: 23.7685,
     latitude: 61.4661,
     zoom: 11,
   });
+
+  useEffect(() => {
+    if (selectedPath) {
+      geojson.features = selectedPath.path.features;
+    } else {
+      geojson.features = [];
+    }
+    (mapRef.current?.getSource("geojson") as GeoJSONSource)?.setData(geojson);
+    if (geojson.features.length > 0) {
+      const [x1, y1, x2, y2] = turf.bbox(geojson);
+      mapRef.current?.fitBounds([x1, y1, x2, y2], { padding: 100 });
+    }
+  }, [selectedPath]);
 
   const mapRef = useRef<MapRef>(null);
 
@@ -131,7 +146,7 @@ const MapComponent = ({ setDistance }: IProps) => {
       <Map
         {...viewState}
         ref={mapRef}
-        onMove={e => { setViewState(e.viewState); }}
+        onMove={e => setViewState(e.viewState)}
         onMouseMove={handleMouseMove}
         onClick={handleClick}
         onContextMenu={handleRightClick}

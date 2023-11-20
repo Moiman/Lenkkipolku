@@ -3,6 +3,7 @@ import type { FeatureCollection, Point, LineString } from "geojson";
 import MapComponent from "./map/MapComponent";
 import Distance from "./Distance";
 import Buttons from "./Buttons";
+import type { IPath } from "./paths/pathsTypes";
 import "./App.css";
 
 
@@ -13,12 +14,13 @@ export const geojson: FeatureCollection<Point | LineString> = {
 
 const App = () => {
   const [distance, setDistance] = useState(0);
+  const [selectedPath, setSelectedPath] = useState<IPath | null>(null);
 
   return (
     <>
-      <MapComponent setDistance={setDistance} />
+      <MapComponent setDistance={setDistance} selectedPath={selectedPath} />
       <Distance distance={distance} />
-      <Buttons />
+      <Buttons selectedPath={selectedPath} setSelectedPath={setSelectedPath} />
     </>
   );
 };

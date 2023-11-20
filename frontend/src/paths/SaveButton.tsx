@@ -1,8 +1,14 @@
 import { useState } from "react";
 import SaveModal from "./SaveModal";
+import type { IPath } from "./pathsTypes";
 import SaveSVG from "../assets/save.svg";
 
-const PathsButton = () => {
+interface IProps {
+  selectedPath: IPath | null,
+  setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
+}
+
+const PathsButton = ({ selectedPath, setSelectedPath }: IProps) => {
   const [isSaveOpen, setIsSaveOpen] = useState(false);
 
   return (
@@ -13,6 +19,8 @@ const PathsButton = () => {
       <SaveModal
         isOpen={isSaveOpen}
         closeModal={() => setIsSaveOpen(false)}
+        selectedPath={selectedPath}
+        setSelectedPath={setSelectedPath}
       />
 
     </>
