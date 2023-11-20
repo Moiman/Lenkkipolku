@@ -3,17 +3,15 @@ import UserModal from "./UserModal";
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
 import userSVG from "../assets/user.svg";
-import "./User.css";
 
-
-const User = () => {
+const UserButton = () => {
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
     <>
-      <div className="user-button" onClick={() => setIsUserOpen(true)}>
+      <div className="button" onClick={() => setIsUserOpen(true)}>
         <img src={userSVG}></img>
       </div>
       <UserModal
@@ -28,4 +26,4 @@ const User = () => {
   );
 };
 
-export default User;
+export default UserButton;

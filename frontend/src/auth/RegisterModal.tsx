@@ -1,10 +1,11 @@
 import { isAxiosError } from "axios";
+import { useContext } from "react";
 import { Button, Container, Form, Modal } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import userService from "./userService";
-import { useAuth } from "./AuthProvider";
+import { AuthContext } from "./AuthProvider";
 
 interface Inputs {
   username: string;
@@ -13,7 +14,7 @@ interface Inputs {
 }
 
 const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
-  const { setToken } = useAuth();
+  const authContext = useContext(AuthContext);
 
   const validationSchema = Yup.object({
     username: Yup.string()
@@ -41,9 +42,8 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const res = await userService.register(data);
-      console.log(res);
-      setToken(res.token);
+      const tokens = await userService.register(data);
+      authContext.setAuthState({ authenticated: true, token: tokens.token, refreshToken: tokens.refreshToken });
       closeModal();
       reset();
     } catch (err) {

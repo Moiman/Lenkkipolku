@@ -1,48 +1,19 @@
 import { useState, useRef } from "react";
 import Map, { Source, Layer, NavigationControl } from "react-map-gl/maplibre";
 import * as turf from "@turf/turf";
-import type { LineLayer, MapLayerMouseEvent, MapRef, CircleLayer, GeoJSONSource } from "react-map-gl/maplibre";
+import type { MapLayerMouseEvent, MapRef, GeoJSONSource } from "react-map-gl/maplibre";
 import type { FeatureCollection, Point, LineString, Feature, Position } from "geojson";
 import Distance from "./Distance";
-import User from "./auth/User";
-import AuthProvider from "./auth/AuthProvider";
+import Buttons from "./Buttons";
+import { pointsLayerStyle, linesLayerStyle } from "./map/mapStyle";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./App.css";
 
 
-const geojson: FeatureCollection<Point | LineString> = {
+export const geojson: FeatureCollection<Point | LineString> = {
   type: "FeatureCollection",
   features: []
 };
-
-const pointsLayerStyle: CircleLayer = {
-  id: "my-points",
-  type: "circle",
-  source: "geojson",
-  paint: {
-    "circle-radius": 5,
-    "circle-color": ["get", "color"],
-    "circle-stroke-color": "#000000",
-    "circle-stroke-width": 2
-  },
-  filter: ["in", "$type", "Point"],
-};
-
-const linesLayerStyle: LineLayer = {
-  id: "my-lines",
-  type: "line",
-  source: "geojson",
-  layout: {
-    "line-cap": "round",
-    "line-join": "round"
-  },
-  paint: {
-    "line-color": "#000",
-    "line-width": 2.5
-  },
-  filter: ["in", "$type", "LineString"]
-};
-
 
 const App = () => {
   const [cursor, setCursor] = useState("auto");
@@ -160,7 +131,7 @@ const App = () => {
   };
 
   return (
-    <AuthProvider>
+    <>
       <Map
         {...viewState}
         ref={mapRef}
@@ -181,8 +152,8 @@ const App = () => {
         </Source>
       </Map>
       <Distance distance={distance} />
-      <User />
-    </AuthProvider>
+      <Buttons />
+    </>
   );
 };
 

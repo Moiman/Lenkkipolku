@@ -3,8 +3,10 @@ import { Button, Container, Form, Modal } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+// import userService from "./userService";
+import { useContext } from "react";
+import { AuthContext } from "./AuthProvider";
 import userService from "./userService";
-import { useAuth } from "./AuthProvider";
 
 interface Inputs {
   username: string;
@@ -12,7 +14,7 @@ interface Inputs {
 }
 
 const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
-  const { setToken } = useAuth();
+  const authContext = useContext(AuthContext);
 
   const validationSchema = Yup.object({
     username: Yup.string()
@@ -33,11 +35,8 @@ const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () =>
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      console.log("token1:", localStorage.getItem("token"));
-      const res = await userService.login(data);
-      console.log("token2:", localStorage.getItem("token"));
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("refreshToken", res.refreshToken);
+      const tokens = await userService.login(data);
+      authContext.setAuthState({ authenticated: true, token: tokens.token, refreshToken: tokens.refreshToken });
       closeModal();
       reset();
     } catch (err) {

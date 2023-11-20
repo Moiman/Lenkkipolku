@@ -1,38 +1,51 @@
-import axios from "axios";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { clearTokens, getRefreshToken, getToken, isAuthenticated, setTokens } from "./authHelpers";
+
+interface IAuthState {
+  token: string | null,
+  refreshToken: string | null,
+  authenticated: boolean,
+}
 
 interface ContextType {
-  token: string,
-  setToken: React.Dispatch<React.SetStateAction<string>>,
+  authState: IAuthState,
+  setAuthState: React.Dispatch<React.SetStateAction<IAuthState>>,
+  logout: () => void;
+  getAccessToken: () => string | null;
 }
 const AuthContext = createContext<ContextType>(null!);
 
 const AuthProvider = ({ children }: { children: React.ReactNode; }) => {
   const [authState, setAuthState] = useState({
-    accessToken: null,
-    refreshToken: null,
-    authenticated: null,
+    token: getToken(),
+    refreshToken: getRefreshToken(),
+    authenticated: isAuthenticated(),
   });
-  const [token, setToken] = useState(localStorage.getItem("token") ?? "");
 
   useEffect(() => {
-    console.log(token);
-    if (token) {
-      axios.defaults.headers.common.Authorization = "Bearer " + token;
-      localStorage.setItem("token", token);
+    if (authState.token && authState.refreshToken) {
+      console.log("Setting tokens");
+      setTokens(authState.token, authState.refreshToken);
     } else {
-      delete axios.defaults.headers.common.Authorization;
-      localStorage.removeItem("token");
+      console.log("Clearing tokens");
+      clearTokens();
     }
-  }, [token]);
+  }, [authState]);
 
-  const contextValue = useMemo(
-    () => ({
-      token,
-      setToken,
-    }),
-    [token]
-  );
+  const getAccessToken = () => {
+    return authState.token;
+  };
+
+  const logout = () => {
+    clearTokens();
+    setAuthState({
+      token: null,
+      refreshToken: null,
+      authenticated: false,
+    });
+  };
+
+  const contextValue = { authState, setAuthState, logout, getAccessToken };
 
   return (
     <AuthContext.Provider value={contextValue}>
@@ -41,8 +54,4 @@ const AuthProvider = ({ children }: { children: React.ReactNode; }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
-export default AuthProvider;
+export { AuthContext, AuthProvider };

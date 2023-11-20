@@ -3,7 +3,9 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { useAuth } from "./AuthProvider";
+// import { isAuthenticated } from "./authHelpers";
+import { useContext } from "react";
+import { AuthContext } from "./AuthProvider";
 
 interface IProps {
   isOpen: boolean,
@@ -13,7 +15,7 @@ interface IProps {
 }
 
 const UserModal = ({ isOpen, closeModal, openRegister, openLogin }: IProps) => {
-  const { token, setToken } = useAuth();
+  const authContext = useContext(AuthContext);
 
   const OpenRegisterModal = () => {
     openRegister();
@@ -34,7 +36,7 @@ const UserModal = ({ isOpen, closeModal, openRegister, openLogin }: IProps) => {
         <Modal.Header closeButton></Modal.Header>
         <Container className="d-flex justify-content-around mt-3">
           <Row className="justify-content-around">
-            {token.length === 0
+            {!authContext.authState.authenticated
               ? <>
                 <Col>
                   <Button onClick={OpenRegisterModal}>Register</Button>
@@ -44,7 +46,7 @@ const UserModal = ({ isOpen, closeModal, openRegister, openLogin }: IProps) => {
                 </Col>
               </>
               : <><Col>
-                <Button onClick={() => setToken("")}>Logout</Button>
+                <Button onClick={authContext.logout}>Logout</Button>
               </Col></>
             }
           </Row>
