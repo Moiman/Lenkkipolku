@@ -25,6 +25,7 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
   useEffect(() => {
     if (selectedPath) {
       geojson.features = selectedPath.path.features;
+      setDistance(turf.length(selectedPath.path));
     } else {
       geojson.features = [];
     }
