@@ -1,26 +1,16 @@
-import { useState } from "react";
-import type { IPath } from "./pathsTypes";
-import PathsModal from "./PathsModal";
 import PathSVG from "../assets/path.svg";
 
 interface IProps {
-  selectedPath: IPath | null,
-  setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
+  isPathsOpen: boolean,
+  setIsPathsOpen: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const PathsButton = ({ selectedPath, setSelectedPath }: IProps) => {
-  const [isPathsOpen, setIsPathsOpen] = useState(false);
+const PathsButton = ({ isPathsOpen, setIsPathsOpen }: IProps) => {
   return (
     <>
-      <div className="button" onClick={() => setIsPathsOpen(true)}>
+      <div className="button" onClick={() => setIsPathsOpen(!isPathsOpen)}>
         <img src={PathSVG} />
       </div>
-      <PathsModal
-        isOpen={isPathsOpen}
-        closeModal={() => setIsPathsOpen(false)}
-        selectedPath={selectedPath}
-        setSelectedPath={setSelectedPath}
-      />
     </>
   );
 };

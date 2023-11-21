@@ -9,16 +9,18 @@ import "./Buttons.css";
 interface IPorps {
   selectedPath: IPath | null,
   setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
+  isPathsOpen: boolean,
+  setIsPathsOpen: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const Buttons = ({ selectedPath, setSelectedPath }: IPorps) => {
+const Buttons = ({ selectedPath, setSelectedPath, isPathsOpen, setIsPathsOpen }: IPorps) => {
   const authContext = useContext(AuthContext);
   return (
     <div className="buttons">
       <UserButton />
       {authContext.authState.authenticated &&
         <>
-          <PathsButton selectedPath={selectedPath} setSelectedPath={setSelectedPath} />
+          <PathsButton isPathsOpen={isPathsOpen} setIsPathsOpen={setIsPathsOpen} />
           <SaveButton selectedPath={selectedPath} setSelectedPath={setSelectedPath} />
         </>
       }

@@ -5,3 +5,13 @@ body {
 #root {
   height: 100vh;
 }
+
+#container {
+  display: flex;
+  height: 100vh;
+}
+
+#map-component {
+  flex: 1;
+  position: relative;
+}
