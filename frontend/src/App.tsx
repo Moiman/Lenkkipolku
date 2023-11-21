@@ -21,7 +21,7 @@ const App = () => {
   return (
     <div id="container">
       {isPathsOpen &&
-        <PathsSideBar isOpen={isPathsOpen} close={() => setIsPathsOpen(false)} selectedPath={selectedPath} setSelectedPath={setSelectedPath} />
+        <PathsSideBar close={() => setIsPathsOpen(false)} selectedPath={selectedPath} setSelectedPath={setSelectedPath} />
       }
       <div id="map-component">
         <MapComponent setDistance={setDistance} selectedPath={selectedPath} />

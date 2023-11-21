@@ -5,19 +5,16 @@ import type { IPath } from "./pathsTypes";
 import "./PathsSideBar.css";
 
 interface IProps {
-  isOpen: boolean,
   close: () => void,
   selectedPath: IPath | null,
   setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
 }
 
-const PathsSideBar = ({ isOpen, close, selectedPath, setSelectedPath }: IProps) => {
+const PathsSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
   const [paths, setPaths] = useState([] as IPath[]);
   useEffect(() => {
-    if (isOpen) {
-      pathsService.getAll().then(data => setPaths(data));
-    }
-  }, [isOpen]);
+    pathsService.getAll().then(data => setPaths(data));
+  }, []);
 
   const deletePath = async (id: number) => {
     await pathsService.deletePath(id);

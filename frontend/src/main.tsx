@@ -17,5 +17,5 @@ ReactDOM.createRoot(rootElement).render(
         <App />
       </AxiosInterceptor>
     </AuthProvider>
-  </React.StrictMode >
+  </React.StrictMode>
 );
