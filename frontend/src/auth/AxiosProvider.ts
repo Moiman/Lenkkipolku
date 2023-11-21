@@ -37,11 +37,9 @@ const AxiosInterceptor = ({ children }: { children: React.ReactNode; }) => {
           || originalRequest._retry
           || !authContext.authState.refreshToken
         ) {
-          console.log("not 401", originalRequest?._retry);
           return Promise.reject(err);
         }
         try {
-          console.log("401");
           const res = await userService.refresh(authContext.authState.refreshToken);
           // TODO FIX THIS RACE CONDITION without localStorage.setItem
           // localStorage.setItem("token", res.token);
