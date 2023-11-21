@@ -10,4 +10,4 @@ I want to remove my path, so old paths don't clutter my list
 
 I want organize my path list, so I can see most important path first.
 
-I want to delete all my data, so I can keep my privacy
+I want to delete all my data, so I can be in control of my privacy
