@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Row, Col, ListGroup } from "react-bootstrap";
+import { Button, Row, Col, ListGroup, CloseButton } from "react-bootstrap";
 import pathsService from "./pathsService";
 import type { IPath } from "./pathsTypes";
 import "./PathsSideBar.css";
@@ -40,7 +40,7 @@ const PathsSideBar = ({ isOpen, close, selectedPath, setSelectedPath }: IProps) 
           <h2>Path list</h2>
         </Col>
         <Col xs="2">
-          <Button variant="outline-danger" onClick={close}>X</Button>
+          <CloseButton onClick={close} />
         </Col>
       </Row>
       <ListGroup>
