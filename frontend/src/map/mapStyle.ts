@@ -28,4 +28,23 @@ const linesLayerStyle: LineLayer = {
   filter: ["in", "$type", "LineString"]
 };
 
-export { pointsLayerStyle, linesLayerStyle };
+const drawPointsLayerStyle: CircleLayer = {
+  id: "draw-points",
+  type: "circle",
+  source: "geojson",
+  paint: {
+    "circle-radius": 5,
+    "circle-color": "#ffffff",
+    "circle-stroke-color": "#000000",
+    "circle-stroke-width": 2,
+    "circle-stroke-opacity": 0.5,
+    "circle-opacity": 0.5
+  },
+  filter: ["in", "$type", "Point"],
+};
+
+export {
+  pointsLayerStyle,
+  linesLayerStyle,
+  drawPointsLayerStyle,
+};

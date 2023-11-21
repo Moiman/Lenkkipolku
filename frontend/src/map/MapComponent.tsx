@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import Map, { Source, Layer, NavigationControl } from "react-map-gl/maplibre";
 import * as turf from "@turf/turf";
 import type { MapLayerMouseEvent, MapRef, GeoJSONSource } from "react-map-gl/maplibre";
-import type { Point, LineString, Feature, Position } from "geojson";
-import { pointsLayerStyle, linesLayerStyle } from "./mapStyle";
+import type { Point, LineString, FeatureCollection, Feature, Position } from "geojson";
+import { pointsLayerStyle, linesLayerStyle, drawPointsLayerStyle } from "./mapStyle";
 import { IPath } from "../paths/pathsTypes";
 import { geojson } from "../App";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -13,6 +13,11 @@ interface IProps {
   setDistance: React.Dispatch<React.SetStateAction<number>>,
   selectedPath: IPath | null,
 }
+
+const drawGeojson: FeatureCollection<Point | LineString> = {
+  type: "FeatureCollection",
+  features: []
+};
 
 const MapComponent = ({ setDistance, selectedPath }: IProps) => {
   const [cursor, setCursor] = useState("auto");
@@ -81,6 +86,24 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
         ? "pointer"
         : "crosshair"
     );
+    if (features?.length) {
+      if (features[0].layer.id === "my-lines") {
+        console.log(features[0]);
+        const newPoint: Feature<Point> = {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [e.lngLat.lng, e.lngLat.lat],
+          },
+          "properties": {
+            "id": String(new Date().getTime()),
+          }
+        };
+        drawGeojson.features.pop();
+        drawGeojson.features.push(newPoint);
+        (e.target.getSource("drawGeojson") as GeoJSONSource)?.setData(drawGeojson);
+      }
+    }
   };
 
   const handleRightClick = (e: MapLayerMouseEvent) => {
@@ -126,6 +149,9 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
     if (e.features?.length) {
       e.preventDefault();
       const pointToMove = e.features[0];
+      if (pointToMove.layer.id === "draw-points") {
+        return;
+      }
       const pointToMoveIndex = geojson.features.findIndex(p => p.properties?.id === pointToMove.properties.id);
       const onPointMove = (ev: MapLayerMouseEvent) => {
         setCursor("grabbing");
@@ -152,7 +178,7 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
         onClick={handleClick}
         onContextMenu={handleRightClick}
         onMouseDown={handleMouseDown}
-        interactiveLayerIds={["my-points"]}
+        interactiveLayerIds={["my-points", "my-lines", "draw-points"]}
         cursor={cursor}
         maxBounds={[[23.446809, 61.332591], [24.090196, 61.599578]]}
         mapStyle="http://localhost:8081/style.json"
@@ -161,6 +187,9 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
         <Source id="geojson" type="geojson" data={geojson}>
           <Layer {...linesLayerStyle} />
           <Layer {...pointsLayerStyle} />
+        </Source>
+        <Source id="drawGeojson" type="geojson" data={drawGeojson}>
+          <Layer {...drawPointsLayerStyle} />
         </Source>
       </Map>
     </>
