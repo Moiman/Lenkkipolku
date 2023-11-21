@@ -67,34 +67,37 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
         <Modal.Header closeButton></Modal.Header>
         <Container>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="formUsername">
               <Form.Label>Username</Form.Label>
               <Form.Control
                 {...register("username")}
                 isInvalid={!!errors.username}
                 type="text"
+                autoComplete="username"
               />
               <Form.Control.Feedback type="invalid">
                 {errors.username?.message}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="formPassword">
               <Form.Label>Password</Form.Label>
               <Form.Control
                 {...register("password")}
                 isInvalid={!!errors.password}
                 type="password"
+                autoComplete="new-password"
               />
               <Form.Control.Feedback type="invalid">
                 {errors.password?.message}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="formConfirmPassword">
               <Form.Label>Confirm password</Form.Label>
               <Form.Control
                 {...register("confirmPassword")}
                 isInvalid={!!errors.confirmPassword}
                 type="password"
+                autoComplete="new-password"
               />
               <Form.Control.Feedback type="invalid">
                 {errors.confirmPassword?.message}

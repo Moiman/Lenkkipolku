@@ -72,7 +72,7 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath }: IProp
             </Modal.Header>
             <Container className="mt-3">
               <Form onSubmit={handleSubmit(onSubmit)}>
-                <Form.Group className="mb-3">
+                <Form.Group className="mb-3" controlId="formTitle">
                   <Form.Label>Title</Form.Label>
                   <Form.Control
                     {...register("title")}
