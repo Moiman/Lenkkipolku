@@ -8,17 +8,6 @@ const router = express.Router();
 
 const refreshSecret = process.env.REFRESH_SECRET!;
 
-router.get("/", async (_req, res) => {
-  try {
-    const users = await dao.findAllUsers();
-    res.json(users);
-    return;
-  } catch (err) {
-    res.status(500).end();
-    return;
-  }
-});
-
 router.post("/register", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
