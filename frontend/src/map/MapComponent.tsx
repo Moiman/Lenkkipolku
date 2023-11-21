@@ -34,7 +34,7 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
       const [x1, y1, x2, y2] = turf.bbox(geojson);
       mapRef.current?.fitBounds([x1, y1, x2, y2], { padding: 100 });
     }
-  }, [selectedPath]);
+  }, [selectedPath, setDistance]);
 
   const mapRef = useRef<MapRef>(null);
 
