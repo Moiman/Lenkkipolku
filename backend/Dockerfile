@@ -15,7 +15,7 @@ RUN npm run build
 FROM alpine:3.18 AS final
 WORKDIR /app
 
-COPY --from=builder ./app/dist ./dist
+COPY --from=builder /app/dist ./dist
 COPY ./package*.json ./
 
 RUN apk add --update nodejs npm
@@ -27,6 +27,8 @@ ARG PG_PORT
 ARG PG_USERNAME
 ARG PG_PASSWORD
 ARG PG_DATABASE
+ARG SECRET
+ARG REFRESH_SECRET
 
 ENV PORT=${PORT}
 ENV PG_HOST=${PG_HOST}
@@ -34,6 +36,8 @@ ENV PG_PORT=${PG_PORT}
 ENV PG_USERNAME=${PG_USERNAME}
 ENV PG_PASSWORD=${PG_PASSWORD}
 ENV PG_DATABASE=${PG_DATABASE}
+ENV SECRET=${SECRET}
+ENV REFRESH_SECRET=${REFRESH_SECRET}
 
 EXPOSE 3000
 CMD ["npm", "start"]

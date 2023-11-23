@@ -1,7 +1,8 @@
 import request from "supertest";
 import server from "../src/server.js";
 import jwt from "jsonwebtoken";
-import { createUsersTable, executeQuery, pool } from "../src/db.js";
+import { executeQuery, pool } from "../src/db.js";
+import { createUsersTableQuery } from "../src/users/usersQueries.js";
 
 const secret = process.env.SECRET;
 
@@ -10,7 +11,7 @@ if (!secret) {
 }
 
 beforeEach(() => {
-  return createUsersTable();
+  return executeQuery(createUsersTableQuery);
 });
 
 afterEach(() => {

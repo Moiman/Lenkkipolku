@@ -31,12 +31,15 @@ const executeQuery = async (query: string, parameters?: unknown[]) => {
   }
 };
 
-const createUsersTable = async () => {
-  await executeQuery(createUsersTableQuery);
+const createTables = async () => {
+  await executeQuery(createUsersTableQuery).catch((err) => {
+    console.log(err);
+  });
+  console.log("Users table created");
+  await executeQuery(createPathsTableQuery).catch((err) => {
+    console.log(err);
+  });
+  console.log("Paths table created");
 };
 
-const createPathsTable = async () => {
-  await executeQuery(createPathsTableQuery);
-};
-
-export { createUsersTable, createPathsTable, executeQuery, pool };
+export { createTables, executeQuery, pool };

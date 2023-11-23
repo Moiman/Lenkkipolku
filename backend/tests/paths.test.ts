@@ -1,10 +1,11 @@
 import request from "supertest";
 import server from "../src/server.js";
-import { createPathsTable, createUsersTable, executeQuery, pool } from "../src/db.js";
+import { createTables, executeQuery, pool } from "../src/db.js";
+import { createPathsTableQuery } from "../src/paths/pathsQueries.js";
 
 let token = "";
 beforeAll(async () => {
-  await createUsersTable();
+  await createTables();
   const res = await request(server)
     .post("/users/register")
     .send({ username: "test", password: "salainen" });
@@ -12,7 +13,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  return createPathsTable();
+  return executeQuery(createPathsTableQuery);
 });
 
 afterEach(async () => {
@@ -89,7 +90,7 @@ describe("Server", () => {
     const res3 = await request(server)
       .put("/paths/" + res.body.id)
       .set("Authorization", "Bearer " + token)
-      .send({ title: "reitti3"})
+      .send({ title: "reitti3" })
       .expect(200)
       .expect("Content-Type", /json/);
     expect(res3.body.title).toBe("reitti3");
@@ -97,10 +98,10 @@ describe("Server", () => {
     const res4 = await request(server)
       .put("/paths/" + res.body.id)
       .set("Authorization", "Bearer " + token)
-      .send({ path: [1,2]})
+      .send({ path: [1, 2] })
       .expect(200)
       .expect("Content-Type", /json/);
-    expect(res4.body.path).toStrictEqual([1,2]);
+    expect(res4.body.path).toStrictEqual([1, 2]);
     expect(res4.body.title).toBe(res3.body.title);
   });
   it("Insert path and delete it", async () => {

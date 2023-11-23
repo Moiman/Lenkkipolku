@@ -1,8 +1,7 @@
 import server from "./server.js";
-import { createUsersTable, createPathsTable } from "./db.js";
+import { createTables } from "./db.js";
 
-createUsersTable();
-createPathsTable();
+createTables();
 
 const PORT = process.env.PORT ?? 3000;
 
