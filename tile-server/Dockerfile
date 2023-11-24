@@ -1,7 +1,7 @@
 FROM alpine:3.18 AS builder
 WORKDIR /app
 
-RUN apk add --update nodejs npm
+RUN apk add --no-cache nodejs npm
 RUN npm install -g typescript
 
 COPY package*.json ./
@@ -20,7 +20,7 @@ COPY ./package*.json ./
 COPY ./public ./public
 COPY ./data ./data
 
-RUN apk add --update nodejs npm
+RUN apk add --no-cache nodejs npm
 RUN npm ci --omit=dev
 
 ARG PORT
