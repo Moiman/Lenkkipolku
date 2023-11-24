@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Row, Col, ListGroup, CloseButton } from "react-bootstrap";
+import { Button, Row, Col, CloseButton, ButtonGroup } from "react-bootstrap";
 import pathsService from "./pathsService";
 import type { IPath } from "./pathsTypes";
 import "./PathsSideBar.css";
@@ -43,28 +43,34 @@ const PathsSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
           <CloseButton onClick={close} />
         </Col>
       </Row>
-      <ListGroup>
+      <div id="button-grid">
         {paths.map(path => (
-          <ListGroup.Item
+          <ButtonGroup
+            className="d-flex"
             key={path.id}
-            action onClick={() => loadPath(path)}
-            active={selectedPath?.id === path.id}
           >
-            <Row>
-              <Col>{path.title}</Col>
-              <Col>
-                {new Date(path.created_at).toLocaleDateString()}
-              </Col>
-              <Col xs={2}>
-                <Button as="div" variant="danger" size="sm" onClick={() => deletePath(path.id)}>
-                  X
-                </Button>
-              </Col>
-            </Row>
-          </ListGroup.Item>
+            <Button
+              className="col-10"
+              onClick={() => loadPath(path)}
+              variant={selectedPath?.id === path.id ? "primary" : "outline-primary"}
+            >
+              <Row>
+                <Col>{path.title}</Col>
+                <Col>
+                  {new Date(path.created_at).toLocaleDateString()}
+                </Col>
+              </Row>
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => deletePath(path.id)}
+            >
+              X
+            </Button>
+          </ButtonGroup>
         ))}
-      </ListGroup>
-    </div>
+      </div>
+    </div >
   );
 };
 
