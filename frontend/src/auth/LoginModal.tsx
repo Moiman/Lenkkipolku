@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { isAxiosError } from "axios";
 import { Button, Container, Form, Modal } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -41,9 +42,11 @@ const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () =>
       reset();
     } catch (err) {
       if (isAxiosError(err)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (err.response?.data.error) {
           setError("username", {
             type: "server",
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             message: err.response?.data.error
           });
         }

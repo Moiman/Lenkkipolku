@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { isAxiosError } from "axios";
 import { Button, Container, Form, Modal } from "react-bootstrap";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import pathsService from "./pathsService";
 import type { IPath } from "./pathsTypes";
 import { geojson } from "../App";
@@ -27,7 +28,7 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath }: IProp
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     try {
       if (selectedPath) {
         const updatedPath = await pathsService.updatePath(selectedPath.id, data.title, geojson);
@@ -44,9 +45,11 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath }: IProp
       closeModal();
     } catch (err) {
       if (isAxiosError(err)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (err.response?.data.error) {
           setError("title", {
             type: "server",
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             message: err.response?.data.error
           });
         }

@@ -8,14 +8,19 @@ interface IUser {
   confirmPassword?: string,
 }
 
+interface ITokens {
+  token: string,
+  refreshToken: string,
+}
+
 const register = async (user: IUser) => {
   const res = await axios.post(baseUrl + "register", user);
-  return res.data;
+  return res.data as ITokens;
 };
 
 const login = async (user: IUser) => {
   const res = await axios.post(baseUrl + "login", user);
-  return res.data;
+  return res.data as ITokens;
 };
 
 const refresh = async (refreshToken: string) => {
@@ -25,7 +30,7 @@ const refresh = async (refreshToken: string) => {
     }
   };
   const res = await axios.get(baseUrl + "refresh", config);
-  return res.data;
+  return res.data as ITokens;
 };
 
 export default { register, login, refresh };

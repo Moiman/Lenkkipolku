@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Map, { Source, Layer, NavigationControl } from "react-map-gl/maplibre";
-import * as turf from "@turf/turf";
+import nearestPointOnLine from "@turf/nearest-point-on-line";
+import turflength from "@turf/length";
+import bbox from "@turf/bbox";
 import type { MapLayerMouseEvent, MapRef, GeoJSONSource, MapGeoJSONFeature } from "react-map-gl/maplibre";
 import type { Point, LineString, FeatureCollection, Feature, Position } from "geojson";
 import { pointsLayerStyle, linesLayerStyle, drawPointsLayerStyle, interactiveLinesLayerStyle } from "./mapStyle";
@@ -31,13 +33,13 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
   useEffect(() => {
     if (selectedPath) {
       geojson.features = selectedPath.path.features;
-      setDistance(turf.length(selectedPath.path));
+      setDistance(turflength(selectedPath.path));
     } else {
       geojson.features = [];
     }
     (mapRef.current?.getSource("geojson") as GeoJSONSource)?.setData(geojson);
     if (geojson.features.length > 0) {
-      const [x1, y1, x2, y2] = turf.bbox(geojson);
+      const [x1, y1, x2, y2] = bbox(geojson);
       mapRef.current?.fitBounds([x1, y1, x2, y2], { padding: 100 });
     }
   }, [selectedPath, setDistance]);
@@ -76,7 +78,7 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
       newPath.geometry.coordinates = geojson.features.map((point) => point.geometry.coordinates as Position);
       geojson.features.push(newPath);
     }
-    setDistance(turf.length(newPath));
+    setDistance(turflength(newPath));
   };
 
 
@@ -95,7 +97,7 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
           "type": "Feature",
           "geometry": {
             "type": "Point",
-            "coordinates": turf.nearestPointOnLine(line, [e.lngLat.lng, e.lngLat.lat]).geometry.coordinates,
+            "coordinates": nearestPointOnLine(line, [e.lngLat.lng, e.lngLat.lat]).geometry.coordinates,
           },
           "properties": {
             "id": uuidv4()
@@ -109,8 +111,10 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
         return;
       }
     }
-    drawGeojson.features.pop();
-    (e.target.getSource("drawGeojson") as GeoJSONSource)?.setData(drawGeojson);
+    if (drawGeojson.features.length > 0) {
+      drawGeojson.features = [];
+      (e.target.getSource("drawGeojson") as GeoJSONSource)?.setData(drawGeojson);
+    }
   };
 
   const handleRightClick = (e: MapLayerMouseEvent) => {
@@ -158,7 +162,7 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
       if (pointToMove.layer.id === "draw-points") {
         const newPoint = drawGeojson.features[0];
         const line = geojson.features.find(f => f.geometry.type === "LineString") as Feature<LineString>;
-        const nearestPoint = turf.nearestPointOnLine(line, newPoint);
+        const nearestPoint = nearestPointOnLine(line, newPoint);
 
         geojson.features.splice(nearestPoint.properties.index + 1, 0, newPoint);
         reDrawLine();
@@ -175,8 +179,7 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
       };
 
       setCursor("grab");
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      e.target
+      void e.target
         .on("mousemove", onPointMove)
         .once("mouseup", (e) => e.target.off("mousemove", onPointMove));
     }

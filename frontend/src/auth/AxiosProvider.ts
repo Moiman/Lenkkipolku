@@ -4,6 +4,12 @@ import { AuthContext } from "./AuthProvider";
 import userService from "./userService";
 import { setTokens } from "./authHelpers";
 
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    _retry?: boolean;
+  }
+}
+
 const authAxios = axios.create({
   baseURL: "http://localhost:3000/",
   headers: {
@@ -31,24 +37,28 @@ const AxiosInterceptor = ({ children }: { children: React.ReactNode; }) => {
 
     authAxios.interceptors.response.use(res => res,
       async (err) => {
+        if (!isAxiosError(err) || !err.config) {
+          return Promise.reject(err);
+        }
         const originalRequest = err.config;
-        if (!isAxiosError(err)
-          || err.response?.status !== 401
-          || originalRequest._retry
+        if (err.response?.status !== 401
           || !authContext.authState.refreshToken
         ) {
+          return Promise.reject(err);
+        } else if (originalRequest._retry) {
+
+          authContext.logout();
           return Promise.reject(err);
         }
         try {
           const res = await userService.refresh(authContext.authState.refreshToken);
-          // TODO FIX THIS RACE CONDITION without localStorage.setItem
-          // localStorage.setItem("token", res.token);
-          // localStorage.setItem("refreshToken", res.refreshToken);
+          // TODO FIX THIS RACE CONDITION without localStorage
           setTokens(res.token, res.refreshToken);
           authContext.setAuthState({ authenticated: true, token: res.token, refreshToken: res.refreshToken });
           originalRequest._retry = true;
           return authAxios(originalRequest);
         } catch (err2) {
+          authContext.logout();
           return Promise.reject(err2);
         }
       }

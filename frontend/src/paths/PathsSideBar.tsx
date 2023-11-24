@@ -13,13 +13,16 @@ interface IProps {
 const PathsSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
   const [paths, setPaths] = useState([] as IPath[]);
   useEffect(() => {
-    pathsService.getAll().then(data => setPaths(data));
+    pathsService.getAll().then(paths => setPaths(paths)).catch(err => console.log(err));
   }, []);
 
-  const deletePath = async (id: number) => {
-    await pathsService.deletePath(id);
-    setPaths(paths.filter(path => path.id !== id));
-    setSelectedPath(null);
+  const deletePath = (id: number) => {
+    pathsService.deletePath(id)
+      .then(() => {
+        setPaths(paths.filter(path => path.id !== id));
+        setSelectedPath(null);
+      })
+      .catch(err => console.log(err));
   };
 
   const loadPath = (path: IPath) => {
