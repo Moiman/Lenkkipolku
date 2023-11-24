@@ -2,7 +2,6 @@ FROM alpine:3.18 AS builder
 WORKDIR /app
 
 RUN apk add --no-cache nodejs npm
-RUN npm install -g typescript
 
 COPY package*.json ./
 COPY ./src ./src
