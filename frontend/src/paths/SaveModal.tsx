@@ -66,7 +66,7 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath }: IProp
         >
           <Modal.Body>
             <Modal.Header closeButton>
-              <Modal.Title>
+              <Modal.Title className="text-break">
                 {selectedPath
                   ? <>Editing path: <b>{selectedPath.title}</b></>
                   : "Unsaved path"

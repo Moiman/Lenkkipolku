@@ -1,34 +1,6 @@
 .paths-side-bar {
   flex: 0 0 340px;
-  padding: 20px;
+  padding: 16px;
   background-color: white;
   width: 340px;
-}
-
-#button-grid {
-  text-overflow: clip ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  word-break: break-all;
-}
-
-#button-grid>:not(:first-child):not(:last-child) button {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-#button-grid>:first-child button {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-#button-grid>:last-child button {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-#button-grid>:not(:last-child) button {
-  border-bottom: 0;
 }

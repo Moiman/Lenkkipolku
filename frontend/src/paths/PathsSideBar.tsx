@@ -43,11 +43,11 @@ const PathsSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
           <CloseButton onClick={close} />
         </Col>
       </Row>
-      <div id="button-grid">
+      <ButtonGroup className="d-flex" vertical>
         {paths.map(path => (
           <ButtonGroup
-            className="d-flex"
             key={path.id}
+            size="lg"
           >
             <Button
               className="col-10"
@@ -55,8 +55,8 @@ const PathsSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
               variant={selectedPath?.id === path.id ? "primary" : "outline-primary"}
             >
               <Row>
-                <Col>{path.title}</Col>
-                <Col>
+                <Col sm className="text-break">{path.title}</Col>
+                <Col sm>
                   {new Date(path.created_at).toLocaleDateString()}
                 </Col>
               </Row>
@@ -69,7 +69,7 @@ const PathsSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
             </Button>
           </ButtonGroup>
         ))}
-      </div>
+      </ButtonGroup>
     </div >
   );
 };
