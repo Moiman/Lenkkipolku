@@ -12,6 +12,8 @@ interface IProps {
   closeModal: () => void,
   selectedPath: IPath | null,
   setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
+  paths: IPath[],
+  setPaths: React.Dispatch<React.SetStateAction<IPath[]>>,
 }
 
 interface Inputs {
@@ -19,7 +21,7 @@ interface Inputs {
   pathError: string,
 }
 
-const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath }: IProps) => {
+const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath, paths, setPaths }: IProps) => {
   const {
     register,
     handleSubmit,
@@ -33,6 +35,13 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath }: IProp
       if (selectedPath) {
         const updatedPath = await pathsService.updatePath(selectedPath.id, data.title, geojson);
         setSelectedPath(updatedPath);
+        setPaths(
+          paths.map(path =>
+            path.id === selectedPath.id
+              ? updatedPath
+              : path
+          )
+        );
       } else {
         if (geojson.features.length === 0) {
           setError("pathError", { message: "Missing path" });
@@ -40,6 +49,7 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath }: IProp
         }
         const newPath = await pathsService.newPath(data.title, geojson);
         setSelectedPath(newPath);
+        setPaths(paths.concat(newPath));
       }
       reset();
       closeModal();

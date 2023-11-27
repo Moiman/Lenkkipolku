@@ -11,9 +11,11 @@ interface IPorps {
   setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
   isPathListOpen: boolean,
   setIsPathListOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  paths: IPath[],
+  setPaths: React.Dispatch<React.SetStateAction<IPath[]>>,
 }
 
-const Buttons = ({ selectedPath, setSelectedPath, isPathListOpen: isPathListOpen, setIsPathListOpen: setIsPathsOpen }: IPorps) => {
+const Buttons = ({ selectedPath, setSelectedPath, isPathListOpen: isPathListOpen, setIsPathListOpen: setIsPathsOpen, paths, setPaths }: IPorps) => {
   const authContext = useContext(AuthContext);
   return (
     <div className="buttons">
@@ -21,7 +23,7 @@ const Buttons = ({ selectedPath, setSelectedPath, isPathListOpen: isPathListOpen
       {authContext.authState.authenticated &&
         <>
           <PathsButton isPathListOpen={isPathListOpen} setIsPathListOpen={setIsPathsOpen} />
-          <SaveButton selectedPath={selectedPath} setSelectedPath={setSelectedPath} />
+          <SaveButton selectedPath={selectedPath} setSelectedPath={setSelectedPath} paths={paths} setPaths={setPaths} />
         </>
       }
     </div>

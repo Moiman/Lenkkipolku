@@ -6,9 +6,11 @@ import SaveSVG from "../assets/save.svg";
 interface IProps {
   selectedPath: IPath | null,
   setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
+  paths: IPath[],
+  setPaths: React.Dispatch<React.SetStateAction<IPath[]>>,
 }
 
-const PathsButton = ({ selectedPath, setSelectedPath }: IProps) => {
+const PathsButton = ({ selectedPath, setSelectedPath, paths, setPaths }: IProps) => {
   const [isSaveOpen, setIsSaveOpen] = useState(false);
 
   return (
@@ -21,6 +23,8 @@ const PathsButton = ({ selectedPath, setSelectedPath }: IProps) => {
         closeModal={() => setIsSaveOpen(false)}
         selectedPath={selectedPath}
         setSelectedPath={setSelectedPath}
+        paths={paths}
+        setPaths={setPaths}
       />
 
     </>

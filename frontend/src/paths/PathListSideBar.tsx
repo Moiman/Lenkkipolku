@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Button, Row, Col, CloseButton, ButtonGroup } from "react-bootstrap";
 import pathsService from "./pathsService";
 import type { IPath } from "./pathsTypes";
@@ -8,14 +7,11 @@ interface IProps {
   close: () => void,
   selectedPath: IPath | null,
   setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
+  paths: IPath[],
+  setPaths: React.Dispatch<React.SetStateAction<IPath[]>>,
 }
 
-const PathListSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
-  const [paths, setPaths] = useState([] as IPath[]);
-  useEffect(() => {
-    pathsService.getAll().then(paths => setPaths(paths)).catch(err => console.log(err));
-  }, []);
-
+const PathListSideBar = ({ close, selectedPath, setSelectedPath, paths, setPaths }: IProps) => {
   const deletePath = (id: number) => {
     pathsService.deletePath(id)
       .then(() => {
