@@ -1,14 +1,14 @@
 import PathSVG from "../assets/path.svg";
 
 interface IProps {
-  isPathsOpen: boolean,
-  setIsPathsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  isPathListOpen: boolean,
+  setIsPathListOpen: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const PathsButton = ({ isPathsOpen, setIsPathsOpen }: IProps) => {
+const PathsButton = ({ isPathListOpen: isPathListOpen, setIsPathListOpen: setIsPathListOpen }: IProps) => {
   return (
     <>
-      <div className="button" onClick={() => setIsPathsOpen(!isPathsOpen)}>
+      <div className="button" onClick={() => setIsPathListOpen(!isPathListOpen)}>
         <img src={PathSVG} />
       </div>
     </>

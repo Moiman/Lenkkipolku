@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Row, Col, CloseButton, ButtonGroup } from "react-bootstrap";
 import pathsService from "./pathsService";
 import type { IPath } from "./pathsTypes";
-import "./PathsSideBar.css";
+import "./PathListSideBar.css";
 
 interface IProps {
   close: () => void,
@@ -10,7 +10,7 @@ interface IProps {
   setSelectedPath: React.Dispatch<React.SetStateAction<IPath | null>>,
 }
 
-const PathsSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
+const PathListSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
   const [paths, setPaths] = useState([] as IPath[]);
   useEffect(() => {
     pathsService.getAll().then(paths => setPaths(paths)).catch(err => console.log(err));
@@ -74,4 +74,4 @@ const PathsSideBar = ({ close, selectedPath, setSelectedPath }: IProps) => {
   );
 };
 
-export default PathsSideBar;
+export default PathListSideBar;
