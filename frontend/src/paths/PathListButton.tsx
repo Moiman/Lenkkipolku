@@ -5,7 +5,7 @@ interface IProps {
   setIsPathListOpen: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const PathsButton = ({ isPathListOpen: isPathListOpen, setIsPathListOpen: setIsPathListOpen }: IProps) => {
+const PathListButton = ({ isPathListOpen, setIsPathListOpen }: IProps) => {
   return (
     <>
       <div className="button" onClick={() => setIsPathListOpen(!isPathListOpen)}>
@@ -15,4 +15,4 @@ const PathsButton = ({ isPathListOpen: isPathListOpen, setIsPathListOpen: setIsP
   );
 };
 
-export default PathsButton;
+export default PathListButton;
