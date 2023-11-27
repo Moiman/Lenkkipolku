@@ -31,6 +31,10 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath, paths, 
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
+    if (geojson.features.length === 0) {
+      setError("pathError", { message: "Path has to have at least one point" });
+      return;
+    }
     try {
       if (selectedPath) {
         const updatedPath = await pathsService.updatePath(selectedPath.id, data.title, geojson);
@@ -43,10 +47,6 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath, paths, 
           )
         );
       } else {
-        if (geojson.features.length === 0) {
-          setError("pathError", { message: "Missing path" });
-          return;
-        }
         const newPath = await pathsService.newPath(data.title, geojson);
         setSelectedPath(newPath);
         setPaths(paths.concat(newPath));

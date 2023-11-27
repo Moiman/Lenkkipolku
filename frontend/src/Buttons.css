@@ -26,3 +26,17 @@
 .button:hover img {
   opacity: 0.7;
 }
+
+.edit-buttons {
+  height: 40px;
+  box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.2);
+}
+
+.edit-buttons button img {
+  height: 20px;
+  opacity: 0.5;
+}
+
+.edit-buttons button:hover img {
+  opacity: 0.7;
+}

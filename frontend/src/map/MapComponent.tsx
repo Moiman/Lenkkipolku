@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, type RefObject } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Map, { Source, Layer, NavigationControl } from "react-map-gl/maplibre";
 import nearestPointOnLine from "@turf/nearest-point-on-line";
@@ -14,6 +14,7 @@ import "./copyrightNotice.css";
 
 
 interface IProps {
+  mapRef: RefObject<MapRef>,
   setDistance: React.Dispatch<React.SetStateAction<number>>,
   selectedPath: IPath | null,
 }
@@ -23,7 +24,7 @@ const drawGeojson: FeatureCollection<Point> = {
   features: []
 };
 
-const MapComponent = ({ setDistance, selectedPath }: IProps) => {
+const MapComponent = ({ mapRef, setDistance, selectedPath }: IProps) => {
   const [cursor, setCursor] = useState("auto");
   const [viewState, setViewState] = useState({
     longitude: 23.7685,
@@ -33,19 +34,18 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
 
   useEffect(() => {
     if (selectedPath) {
-      geojson.features = selectedPath.path.features;
+      geojson.features = structuredClone(selectedPath.path.features);
       setDistance(turflength(selectedPath.path));
     } else {
       geojson.features = [];
+      setDistance(0);
     }
     (mapRef.current?.getSource("geojson") as GeoJSONSource)?.setData(geojson);
     if (geojson.features.length > 0) {
       const [x1, y1, x2, y2] = bbox(geojson);
       mapRef.current?.fitBounds([x1, y1, x2, y2], { padding: 100 });
     }
-  }, [selectedPath, setDistance]);
-
-  const mapRef = useRef<MapRef>(null);
+  }, [selectedPath, setDistance, mapRef]);
 
   const reDrawLine = () => {
     //Remove existing paths
@@ -187,34 +187,32 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
   };
 
   return (
-    <>
-      <Map
-        {...viewState}
-        ref={mapRef}
-        onMove={e => setViewState(e.viewState)}
-        onMouseMove={handleMouseMove}
-        onClick={handleClick}
-        onContextMenu={handleRightClick}
-        onMouseDown={handleMouseDown}
-        interactiveLayerIds={["my-points", "interactive-lines", "draw-points"]}
-        cursor={cursor}
-        maxBounds={[[23.446809, 61.332591], [24.090196, 61.599578]]}
-        mapStyle="http://localhost:8081/style.json"
-      >
-        <NavigationControl />
-        <Source id="geojson" type="geojson" data={geojson}>
-          <Layer {...linesLayerStyle} />
-          <Layer {...interactiveLinesLayerStyle} />
-          <Layer {...pointsLayerStyle} />
-        </Source>
-        <Source id="drawGeojson" type="geojson" data={drawGeojson}>
-          <Layer {...drawPointsLayerStyle} />
-        </Source>
-        <div className="copyright-notice">
-          © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
-        </div>
-      </Map>
-    </>
+    <Map
+      {...viewState}
+      ref={mapRef}
+      onMove={e => setViewState(e.viewState)}
+      onMouseMove={handleMouseMove}
+      onClick={handleClick}
+      onContextMenu={handleRightClick}
+      onMouseDown={handleMouseDown}
+      interactiveLayerIds={["my-points", "interactive-lines", "draw-points"]}
+      cursor={cursor}
+      maxBounds={[[23.446809, 61.332591], [24.090196, 61.599578]]}
+      mapStyle="http://localhost:8081/style.json"
+    >
+      <NavigationControl />
+      <Source id="geojson" type="geojson" data={geojson}>
+        <Layer {...linesLayerStyle} />
+        <Layer {...interactiveLinesLayerStyle} />
+        <Layer {...pointsLayerStyle} />
+      </Source>
+      <Source id="drawGeojson" type="geojson" data={drawGeojson}>
+        <Layer {...drawPointsLayerStyle} />
+      </Source>
+      <div className="copyright-notice">
+        © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+      </div>
+    </Map>
   );
 };
 

@@ -7,11 +7,9 @@ interface IProps {
 
 const PathListButton = ({ isPathListOpen, setIsPathListOpen }: IProps) => {
   return (
-    <>
-      <div className="button" onClick={() => setIsPathListOpen(!isPathListOpen)}>
-        <img src={PathSVG} />
-      </div>
-    </>
+    <div className="button" onClick={() => setIsPathListOpen(!isPathListOpen)}>
+      <img src={PathSVG} />
+    </div>
   );
 };
 
