@@ -10,6 +10,7 @@ import { pointsLayerStyle, linesLayerStyle, drawPointsLayerStyle, interactiveLin
 import { IPath } from "../paths/pathsTypes";
 import { geojson } from "./geojson";
 import "maplibre-gl/dist/maplibre-gl.css";
+import "./copyrightNotice.css";
 
 
 interface IProps {
@@ -209,6 +210,9 @@ const MapComponent = ({ setDistance, selectedPath }: IProps) => {
         <Source id="drawGeojson" type="geojson" data={drawGeojson}>
           <Layer {...drawPointsLayerStyle} />
         </Source>
+        <div className="copyright-notice">
+          © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+        </div>
       </Map>
     </>
   );
