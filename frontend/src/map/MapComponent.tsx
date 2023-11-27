@@ -8,7 +8,7 @@ import type { MapLayerMouseEvent, MapRef, GeoJSONSource, MapGeoJSONFeature } fro
 import type { Point, LineString, FeatureCollection, Feature, Position } from "geojson";
 import { pointsLayerStyle, linesLayerStyle, drawPointsLayerStyle, interactiveLinesLayerStyle } from "./mapStyle";
 import { IPath } from "../paths/pathsTypes";
-import { geojson } from "../App";
+import { geojson } from "./geojson";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 

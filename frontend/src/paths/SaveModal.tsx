@@ -4,7 +4,7 @@ import { Button, Container, Form, Modal } from "react-bootstrap";
 import { SubmitHandler, useForm } from "react-hook-form";
 import pathsService from "./pathsService";
 import type { IPath } from "./pathsTypes";
-import { geojson } from "../App";
+import { geojson } from "../map/geojson";
 
 
 interface IProps {

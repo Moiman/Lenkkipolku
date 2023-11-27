@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import type { FeatureCollection, Point, LineString } from "geojson";
 import MapComponent from "./map/MapComponent";
 import Distance from "./Distance";
 import Buttons from "./Buttons";
@@ -9,11 +8,6 @@ import type { IPath } from "./paths/pathsTypes";
 import "./App.css";
 
 
-export const geojson: FeatureCollection<Point | LineString> = {
-  type: "FeatureCollection",
-  features: []
-};
-
 const App = () => {
   const [distance, setDistance] = useState(0);
   const [isPathListOpen, setIsPathListOpen] = useState(false);
@@ -21,7 +15,7 @@ const App = () => {
   const [paths, setPaths] = useState([] as IPath[]);
 
   useEffect(() => {
-    pathsService.getAll().then(paths => setPaths(paths)).catch(err => console.log(err));
+    pathsService.getAll().then(paths => setPaths(paths)).catch(() => console.log("Failed to fetch paths"));
   }, []);
 
   return (
