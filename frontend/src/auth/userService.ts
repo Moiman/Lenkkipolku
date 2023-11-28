@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "./AxiosProvider";
 
 const baseUrl = "http://localhost:3000/users/";
 
@@ -33,4 +34,8 @@ const refresh = async (refreshToken: string) => {
   return res.data as ITokens;
 };
 
-export default { register, login, refresh };
+const remove = async () => {
+  await api.delete(baseUrl + "delete");
+};
+
+export default { register, login, refresh, remove };
