@@ -15,7 +15,6 @@ app.use(express.json());
 app.use("/users", usersRouter);
 app.use(requestLog);
 app.use("/paths", passport.authenticate("jwt", { session: false }), pathsRouter);
-// app.use("/paths", pathsRouter);
 app.use(unknownEndpoint);
 
 export default app;
