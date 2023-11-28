@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import type { MapRef } from "react-map-gl/maplibre";
+import { useContext, useEffect, useRef, useState } from "react";
+import type { GeoJSONSource, MapRef } from "react-map-gl/maplibre";
 import MapComponent from "./map/MapComponent";
 import Distance from "./map/Distance";
 import Buttons from "./Buttons";
 import PathListSideBar from "./paths/PathListSideBar";
 import pathsService from "./paths/pathsService";
 import type { IPath } from "./paths/pathsTypes";
+import { AuthContext } from "./auth/AuthProvider";
+import { geojson } from "./map/geojson";
 import "./App.css";
 
 
@@ -14,12 +16,22 @@ const App = () => {
   const [isPathListOpen, setIsPathListOpen] = useState(false);
   const [selectedPath, setSelectedPath] = useState<IPath | null>(null);
   const [paths, setPaths] = useState([] as IPath[]);
+  const authContext = useContext(AuthContext);
 
   const mapRef = useRef<MapRef>(null);
 
   useEffect(() => {
-    pathsService.getAll().then(paths => setPaths(paths)).catch(() => console.log("Failed to fetch paths"));
-  }, []);
+    if (authContext.authState.authenticated) {
+      pathsService.getAll().then(paths => setPaths(paths)).catch(() => console.log("Failed to fetch paths"));
+    } else {
+      setDistance(0);
+      setIsPathListOpen(false);
+      setSelectedPath(null);
+      setPaths([]);
+      geojson.features = [];
+      (mapRef.current?.getSource("geojson") as GeoJSONSource)?.setData(geojson);
+    }
+  }, [authContext.authState.authenticated]);
 
   return (
     <div id="container">

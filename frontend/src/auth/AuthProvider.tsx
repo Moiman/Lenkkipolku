@@ -43,6 +43,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode; }) => {
       refreshToken: null,
       authenticated: false,
     });
+    window.location.reload();
   };
 
   const contextValue = { authState, setAuthState, logout, getAccessToken };
