@@ -1,7 +1,7 @@
 const createPathsTableQuery = `
 CREATE TABLE IF NOT EXISTS "paths" (
     "id" SERIAL PRIMARY KEY,
-    "user_id" INTEGER NOT NULL REFERENCES users,
+    "user_id" INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
     "title" TEXT NOT NULL,
     "path" JSONB NOT NULL,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

@@ -15,7 +15,7 @@ const findUserWithUsername = "SELECT * FROM users WHERE username = $1";
 
 const insertUser = "INSERT INTO users ( username, password) VALUES( $1, $2) RETURNING id;";
 
-const updateUser = "UPDATE users SET username = $2, password = $3, updated_at = CURRENT_TIMESTAMP() WHERE id = $1";
+const updateUser = "UPDATE users SET password = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $1";
 
 const deleteUserById = "DELETE FROM users WHERE id = $1";
 

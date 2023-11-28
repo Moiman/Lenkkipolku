@@ -31,13 +31,13 @@ const insertUser = async (username: string, passwordHash: string) => {
   return result.rows[0] as { id: number; };
 };
 
-const updateUser = async (user: { id: number, password: string; }) => {
-  const params = [user.id, user.password];
+const updateUser = async (id: number, password: string) => {
+  const params = [id, password];
   const result = await executeQuery(queries.updateUser, params);
   return result;
 };
 
-const deleteUserById = async (id: string) => {
+const deleteUserById = async (id: number) => {
   const result = await executeQuery(queries.deleteUserById, [id]);
   return result;
 };

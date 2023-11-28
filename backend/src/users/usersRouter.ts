@@ -1,6 +1,7 @@
 import express from "express";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
+import passport from "passport";
 import * as dao from "./usersDao.js";
 import { createNewTokens } from "./tokenHelpers.js";
 
@@ -83,6 +84,40 @@ router.get("/refresh", async (req, res) => {
       return res.status(401).json({ error: "Expired token" });
     }
     return res.status(401).json({ error: "Invalid token" });
+  }
+});
+
+router.put("/password", passport.authenticate("jwt", { session: false }), async (req, res) => {
+  if (!(req.user && "id" in req.user)) {
+    return res.status(500).end();
+  }
+  const user_id = Number(req.user.id);
+
+  const password = req.body.password;
+  if (!password || typeof password !== "string") {
+    return res.status(400).json({ error: "Missing password" });
+  }
+
+  try {
+    const hash = await argon2.hash(password);
+    await dao.updateUser(user_id, hash);
+    return res.status(204).end();
+  } catch (err) {
+    return res.status(500).end();
+  }
+});
+
+router.delete("/delete", passport.authenticate("jwt", { session: false }), async (req,res) => {
+  if (!(req.user && "id" in req.user)) {
+    return res.status(500).end();
+  }
+  const user_id = Number(req.user.id);
+
+  try {
+    await dao.deleteUserById(user_id);
+    return res.status(204).end();
+  } catch (err) {
+    return res.status(500).end();
   }
 });
 

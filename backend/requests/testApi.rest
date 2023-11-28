@@ -32,6 +32,18 @@ GET http://localhost:3000/users/refresh
 Authorization: Bearer {{login.response.body.token}}
 ### Refresh token test without token
 GET http://localhost:3000/users/refresh
+### Change password
+PUT http://localhost:3000/users/password
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "password": "aaaaaa"
+}
+### Delete user
+DELETE http://localhost:3000/users/delete
+Authorization: Bearer {{login.response.body.token}}
+
 ### Paths
 GET http://localhost:3000/paths
 Authorization: Bearer {{login.response.body.token}}
