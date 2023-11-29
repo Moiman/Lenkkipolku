@@ -38,4 +38,14 @@ const remove = async () => {
   await api.delete(baseUrl + "delete");
 };
 
-export default { register, login, refresh, remove };
+const changePassword = (passwords: { password: string, confirmPassword: string, }) => {
+  return api.put(baseUrl + "password", passwords);
+};
+
+export default {
+  register,
+  login,
+  refresh,
+  remove,
+  changePassword,
+};

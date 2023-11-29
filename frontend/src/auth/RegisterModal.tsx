@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { isAxiosError } from "axios";
 import { useContext } from "react";
 import { Button, Container, Form, Modal } from "react-bootstrap";
@@ -49,12 +48,12 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
       reset();
     } catch (err) {
       if (isAxiosError(err)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        if (err.response?.data.error) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+        const errorMessage = err.response?.data.error;
+        if (errorMessage && typeof errorMessage === "string") {
           setError("username", {
             type: "server",
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            message: err.response?.data.error
+            message: errorMessage
           });
         }
       }
@@ -62,12 +61,13 @@ const RegisterModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: ()
   };
 
   return (
-    <Modal
-      show={isOpen}
-      onHide={closeModal}
-    >
+    <Modal show={isOpen} onHide={() => { closeModal(); reset(); }}>
+      <Modal.Header closeButton>
+        <Modal.Title className="text-break">
+          Register
+        </Modal.Title>
+      </Modal.Header>
       <Modal.Body>
-        <Modal.Header closeButton></Modal.Header>
         <Container>
           <Form onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3" controlId="formUsername">

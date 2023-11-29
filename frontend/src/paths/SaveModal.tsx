@@ -55,12 +55,12 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath, paths, 
       closeModal();
     } catch (err) {
       if (isAxiosError(err)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        if (err.response?.data.error) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+        const errorMessage = err.response?.data.error;
+        if (errorMessage && typeof errorMessage === "string") {
           setError("title", {
             type: "server",
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            message: err.response?.data.error
+            message: errorMessage
           });
         }
       }
@@ -68,57 +68,50 @@ const PathsModal = ({ isOpen, closeModal, selectedPath, setSelectedPath, paths, 
   };
 
   return (
-    <>
-      {isOpen &&
-        <Modal
-          show={isOpen}
-          onHide={() => { reset(); closeModal(); }}
-        >
-          <Modal.Body>
-            <Modal.Header closeButton>
-              <Modal.Title className="text-break">
-                {selectedPath
-                  ? <>Editing path: <b>{selectedPath.title}</b></>
-                  : "Unsaved path"
-                }
-              </Modal.Title>
-            </Modal.Header>
-            <Container className="mt-3">
-              <Form onSubmit={handleSubmit(onSubmit)}>
-                <Form.Group className="mb-3" controlId="formTitle">
-                  <Form.Label>Title</Form.Label>
-                  <Form.Control
-                    {...register("title")}
-                    isInvalid={!!errors.title}
-                    defaultValue={selectedPath?.title}
-                    type="text"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.title?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Control
-                    {...register("pathError")}
-                    isInvalid={!!errors.pathError}
-                    type="hidden"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.pathError?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Button type="submit" className="me-1">
-                  {selectedPath
-                    ? "Save"
-                    : "Save as new path"
-                  }
-                </Button>
-              </Form>
-            </Container>
-          </Modal.Body>
-        </Modal>
-      }
-    </>
+    <Modal show={isOpen} onHide={() => { closeModal(); reset(); }}>
+      <Modal.Header closeButton>
+        <Modal.Title className="text-break">
+          {selectedPath
+            ? <>Editing path: <b>{selectedPath.title}</b></>
+            : "Unsaved path"
+          }
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Container className="mt-3">
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            <Form.Group className="mb-3" controlId="formTitle">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                {...register("title")}
+                isInvalid={!!errors.title}
+                defaultValue={selectedPath?.title}
+                type="text"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.title?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group>
+              <Form.Control
+                {...register("pathError")}
+                isInvalid={!!errors.pathError}
+                type="hidden"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.pathError?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Button type="submit" className="me-1">
+              {selectedPath
+                ? "Save"
+                : "Save as new path"
+              }
+            </Button>
+          </Form>
+        </Container>
+      </Modal.Body>
+    </Modal>
   );
 };
 

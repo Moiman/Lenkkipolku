@@ -1,11 +1,12 @@
-import { Container } from "react-bootstrap";
+import { useContext, useState } from "react";
+import { ButtonGroup, Container } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { useContext } from "react";
 import { AuthContext } from "./AuthProvider";
-import userService from "./userService";
+import PasswordChangeModal from "./PasswordChangeModal";
+import ConfirmModal from "./ConfirmModal";
 
 interface IProps {
   isOpen: boolean,
@@ -15,6 +16,9 @@ interface IProps {
 }
 
 const UserModal = ({ isOpen, closeModal, openRegister, openLogin }: IProps) => {
+  const [isPasswordChangeModalOpen, setIsPasswordChangeModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
   const authContext = useContext(AuthContext);
 
   const OpenRegisterModal = () => {
@@ -27,43 +31,53 @@ const UserModal = ({ isOpen, closeModal, openRegister, openLogin }: IProps) => {
     closeModal();
   };
 
-  const deleteUser = () => {
-    userService.remove()
-      .then(() => authContext.logout())
-      .catch(() => console.log("Deleting user failed"));
+  const OpenPasswordChangeModal = () => {
+    setIsPasswordChangeModalOpen(true);
+    closeModal();
+  };
+
+  const OpenDeleteUserModal = () => {
+    setIsConfirmModalOpen(true);
+    closeModal();
   };
 
   return (
-    <Modal
-      show={isOpen}
-      onHide={closeModal}
-    >
-      <Modal.Body>
+    <>
+      <Modal show={isOpen} onHide={closeModal}>
         <Modal.Header closeButton></Modal.Header>
-        <Container className="d-flex justify-content-around mt-3">
-          <Row className="justify-content-around">
+        <Modal.Body>
+          <Container className="d-flex justify-content-around mt-3">
             {authContext.authState.authenticated
-              ? <>
-                <Col>
-                  <Button onClick={authContext.logout}>Logout</Button>
-                </Col>
-                <Col>
-                  <Button onClick={deleteUser}>Delete account</Button>
-                </Col>
-              </>
-              : <>
+              ?
+              <ButtonGroup>
+                <Button onClick={authContext.logout}>Logout</Button>
+                <Button variant="outline-primary" onClick={OpenPasswordChangeModal}>
+                  Change password
+                </Button>
+                <Button variant="outline-danger" onClick={OpenDeleteUserModal}>
+                  Delete account</Button>
+              </ButtonGroup>
+              :
+              <Row className="justify-content-around">
                 <Col>
                   <Button onClick={OpenRegisterModal}>Register</Button>
                 </Col>
                 <Col>
                   <Button onClick={OpenLoginModal}>Login</Button>
                 </Col>
-              </>
+              </Row>
             }
-          </Row>
-        </Container>
-      </Modal.Body>
-    </Modal>
+          </Container>
+        </Modal.Body>
+      </Modal>
+      <PasswordChangeModal
+        isOpen={isPasswordChangeModalOpen}
+        closeModal={() => setIsPasswordChangeModalOpen(false)} />
+      <ConfirmModal
+        message={"Are you sure you want to delete your account?"}
+        isOpen={isConfirmModalOpen}
+        closeModal={() => setIsConfirmModalOpen(false)} />
+    </>
   );
 };
 

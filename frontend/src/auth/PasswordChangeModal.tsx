@@ -3,23 +3,22 @@ import { Button, Container, Form, Modal } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { useContext } from "react";
-import { AuthContext } from "./AuthProvider";
 import userService from "./userService";
 
 interface Inputs {
-  username: string;
   password: string;
+  confirmPassword: string;
 }
 
-const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
-  const authContext = useContext(AuthContext);
-
+const PasswordChangeModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () => void; }) => {
   const validationSchema = Yup.object({
-    username: Yup.string()
-      .required("Username is required"),
     password: Yup.string()
-      .required("Password is required"),
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters")
+      .max(40, "Password must not exceed 40 characters"),
+    confirmPassword: Yup.string()
+      .required("Confirm Password is required")
+      .oneOf([Yup.ref("password")], "Confirm Password does not match"),
   });
 
   const {
@@ -34,8 +33,7 @@ const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () =>
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const tokens = await userService.login(data);
-      authContext.setAuthState({ authenticated: true, token: tokens.token, refreshToken: tokens.refreshToken });
+      await userService.changePassword(data);
       closeModal();
       reset();
     } catch (err) {
@@ -43,7 +41,7 @@ const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () =>
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
         const errorMessage = err.response?.data.error;
         if (errorMessage && typeof errorMessage === "string") {
-          setError("username", {
+          setError("password", {
             type: "server",
             message: errorMessage
           });
@@ -56,34 +54,34 @@ const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () =>
     <Modal show={isOpen} onHide={() => { closeModal(); reset(); }}>
       <Modal.Header closeButton>
         <Modal.Title className="text-break">
-          Login
+          Change password
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Container>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Form.Group className="mb-3" controlId="formUsername">
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                {...register("username")}
-                isInvalid={!!errors.username}
-                type="text"
-                autoComplete="username"
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.username?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
             <Form.Group className="mb-3" controlId="formPassword">
-              <Form.Label>Password</Form.Label>
+              <Form.Label>New password</Form.Label>
               <Form.Control
                 {...register("password")}
                 isInvalid={!!errors.password}
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
               />
               <Form.Control.Feedback type="invalid">
                 {errors.password?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formConfirmPassword">
+              <Form.Label>Confirm password</Form.Label>
+              <Form.Control
+                {...register("confirmPassword")}
+                isInvalid={!!errors.confirmPassword}
+                type="password"
+                autoComplete="new-password"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.confirmPassword?.message}
               </Form.Control.Feedback>
             </Form.Group>
             <Button type="submit" className="me-1">
@@ -102,4 +100,4 @@ const LoginModal = ({ isOpen, closeModal }: { isOpen: boolean, closeModal: () =>
   );
 };
 
-export default LoginModal;
+export default PasswordChangeModal;
