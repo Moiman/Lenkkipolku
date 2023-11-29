@@ -30,7 +30,7 @@ const PathListSideBar = ({ close, selectedPath, setSelectedPath, paths, setPaths
   };
 
   return (
-    <div className="paths-side-bar">
+    <div className="paths-side-bar overflow-y-auto">
       <Row>
         <Col>
           <h2>Path list</h2>
