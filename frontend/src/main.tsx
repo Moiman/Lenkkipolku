@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
+import App from "./App";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { AuthProvider } from "./auth/AuthProvider.tsx";
-import { AxiosInterceptor } from "./auth/AxiosProvider.ts";
+import { AuthProvider } from "./auth/AuthProvider";
+import { AxiosInterceptor } from "./auth/AxiosProvider";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
