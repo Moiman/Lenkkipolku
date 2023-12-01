@@ -1,4 +1,3 @@
-// import { QueryResult } from "pg";
 import { executeQuery } from "../db.js";
 import * as queries from "./pathsQueries.js";
 
