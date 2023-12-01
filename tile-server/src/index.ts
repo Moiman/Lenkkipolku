@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-// @ts-ignore
 import tilesRouter from "./tilesRouter.js";
 import { requestLog, unknownEndpoint } from "./middleware.js";
 
