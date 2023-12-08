@@ -5,7 +5,7 @@ Features:
 - Save paths and view and edit them later.
 
 # Prerequisites
-Node, npm and docker
+Docker
 
 # Run app
 To run app:
