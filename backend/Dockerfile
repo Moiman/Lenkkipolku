@@ -1,4 +1,4 @@
-FROM alpine:3.18 AS builder
+FROM alpine:3.19 AS builder
 WORKDIR /app
 
 RUN apk add --no-cache nodejs npm
@@ -11,7 +11,7 @@ RUN npm ci
 RUN npm run build
 
 
-FROM alpine:3.18 AS final
+FROM alpine:3.19 AS final
 WORKDIR /app
 
 COPY --from=builder /app/dist ./dist
