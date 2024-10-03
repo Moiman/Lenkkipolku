@@ -4,23 +4,26 @@ import type { PassportStatic } from "passport";
 
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.SECRET
+  secretOrKey: process.env.SECRET!,
 };
 
 const passportConfig = (passport: PassportStatic) => {
   passport.use(
-    new JwtStrategy(opts, (jwt_payload: { id: number; }, done) => {
+    new JwtStrategy(opts, (jwt_payload: { id: number }, done) => {
       if (typeof jwt_payload.id !== "number") {
         done(null, false);
       }
       findOneUser(jwt_payload.id)
-        .then(user => {
+        .then((user) => {
           if (user) {
             done(null, user);
           } else {
             done(null, false);
           }
-        }).catch(err => { console.error(err); });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     })
   );
 };
