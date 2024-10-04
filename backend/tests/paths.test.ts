@@ -1,28 +1,24 @@
 import request from "supertest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import server from "../src/server.js";
-import { createTables, executeQuery, pool } from "../src/db.js";
-import { createPathsTableQuery } from "../src/paths/pathsQueries.js";
 
 let token = "";
 beforeAll(async () => {
-  await createTables();
   const res = await request(server)
-    .post("/users/register")
+    .post("/users/login")
     .send({ username: "test", password: "salainen" });
-  token = res.body.token;
-});
-
-beforeEach(async () => {
-  return executeQuery(createPathsTableQuery);
-});
-
-afterEach(async () => {
-  await executeQuery("DROP TABLE paths;");
+  if (res.ok) {
+    token = res.body.token;
+  } else {
+    const res2 = await request(server)
+      .post("/users/register")
+      .send({ username: "test", password: "salainen" });
+    token = res2.body.token;
+  }
 });
 
 afterAll(async () => {
-  await executeQuery("DROP TABLE users;");
-  return pool.end();
+  await request(server).del("/users/delete");
 });
 
 describe("Server", () => {
@@ -43,16 +39,23 @@ describe("Server", () => {
   it("Get paths with expired token", async () => {
     await request(server)
       .get("/paths/")
-      .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzAwMTI1ODg0LCJleHAiOjE3MDAxMjY3ODR9.4xUz7OnluIzdCHtCC7QvvfB0KNQQNbzUHrR-nkqfpA0")
+      .set(
+        "Authorization",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzAwMTI1ODg0LCJleHAiOjE3MDAxMjY3ODR9.4xUz7OnluIzdCHtCC7QvvfB0KNQQNbzUHrR-nkqfpA0"
+      )
       .expect(401);
   });
   it("Insert path", async () => {
-    await request(server)
+    const res = await request(server)
       .post("/paths/")
       .set("Authorization", "Bearer " + token)
       .send({ title: "reitti", path: [1, 2, 3] })
       .expect(200)
       .expect("Content-Type", /json/);
+    await request(server)
+      .del("/paths/" + res.body.id)
+      .set("Authorization", "Bearer " + token)
+      .expect(200);
   });
   it("Insert path and check it", async () => {
     const res = await request(server)
@@ -72,6 +75,10 @@ describe("Server", () => {
       .expect(200)
       .expect("Content-Type", /json/);
     expect(res2.body).toHaveLength(1);
+    await request(server)
+      .del("/paths/" + res.body.id)
+      .set("Authorization", "Bearer " + token)
+      .expect(200);
   });
   it("Insert path and update it", async () => {
     const res = await request(server)
@@ -103,6 +110,10 @@ describe("Server", () => {
       .expect("Content-Type", /json/);
     expect(res4.body.path).toStrictEqual([1, 2]);
     expect(res4.body.title).toBe(res3.body.title);
+    await request(server)
+      .del("/paths/" + res.body.id)
+      .set("Authorization", "Bearer " + token)
+      .expect(200);
   });
   it("Insert path and delete it", async () => {
     const res = await request(server)
