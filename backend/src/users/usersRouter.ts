@@ -7,16 +7,16 @@ import { createNewTokens } from "./tokenHelpers.js";
 
 const router = express.Router();
 
-const refreshSecret = process.env.REFRESH_SECRET!;
+if (!process.env.REFRESH_SECRET) {
+  throw new Error("Missing ENV REFRESH_SECRET");
+}
+const refreshSecret = process.env.REFRESH_SECRET;
 
 router.post("/register", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  if (!username
-    || !password
-    || typeof username !== "string"
-    || typeof password !== "string") {
+  if (!username || !password || typeof username !== "string" || typeof password !== "string") {
     return res.status(400).json({ error: "Missing username or password" });
   }
 
@@ -48,7 +48,7 @@ router.post("/login", async (req, res) => {
 
   try {
     const findUser = await dao.findUserWithUsername(username);
-    if (findUser && await argon2.verify(findUser.password, password)) {
+    if (findUser && (await argon2.verify(findUser.password, password))) {
       const tokens = createNewTokens(findUser.id);
       return res.status(200).json(tokens);
     } else {
@@ -102,12 +102,12 @@ router.put("/password", passport.authenticate("jwt", { session: false }), async 
     const hash = await argon2.hash(password);
     await dao.updateUser(user_id, hash);
     return res.status(204).end();
-  } catch (err) {
+  } catch {
     return res.status(500).end();
   }
 });
 
-router.delete("/delete", passport.authenticate("jwt", { session: false }), async (req,res) => {
+router.delete("/delete", passport.authenticate("jwt", { session: false }), async (req, res) => {
   if (!(req.user && "id" in req.user)) {
     return res.status(500).end();
   }
@@ -116,7 +116,7 @@ router.delete("/delete", passport.authenticate("jwt", { session: false }), async
   try {
     await dao.deleteUserById(user_id);
     return res.status(204).end();
-  } catch (err) {
+  } catch {
     return res.status(500).end();
   }
 });

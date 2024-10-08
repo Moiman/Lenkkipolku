@@ -2,9 +2,13 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { findOneUser } from "./users/usersDao.js";
 import type { PassportStatic } from "passport";
 
+if (!process.env.SECRET) {
+  throw new Error("Missing ENV SECRET");
+}
+
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.SECRET!,
+  secretOrKey: process.env.SECRET,
 };
 
 const passportConfig = (passport: PassportStatic) => {
@@ -14,17 +18,17 @@ const passportConfig = (passport: PassportStatic) => {
         done(null, false);
       }
       findOneUser(jwt_payload.id)
-        .then((user) => {
+        .then(user => {
           if (user) {
             done(null, user);
           } else {
             done(null, false);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.error(err);
         });
-    })
+    }),
   );
 };
 

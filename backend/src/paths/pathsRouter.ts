@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   try {
     const paths = await dao.findAllPaths(user_id);
     return res.json(paths);
-  } catch (err) {
+  } catch {
     return res.status(500).end();
   }
 });
@@ -27,11 +27,11 @@ router.get("/:id(\\d+)", async (req, res) => {
   }
   try {
     const path = await dao.findPath(id, user_id);
-    if(!path) {
+    if (!path) {
       return res.status(404).end();
     }
     return res.json(path);
-  } catch (err) {
+  } catch {
     return res.status(500).end();
   }
 });
@@ -50,7 +50,7 @@ router.post("/", async (req, res) => {
   try {
     const newPath = await dao.insertPath(user_id, title, path);
     return res.json(newPath);
-  } catch (err) {
+  } catch {
     return res.status(500).end();
   }
 });
@@ -73,11 +73,11 @@ router.put("/:id(\\d+)", async (req, res) => {
       return res.status(400).json({ error: "Missing title or path" });
     }
     const newPath = await dao.updatePath(id, user_id, title, path);
-    if(!path) {
+    if (!path) {
       return res.status(404).end();
     }
     return res.json(newPath);
-  } catch (err) {
+  } catch {
     return res.status(500).end();
   }
 });
@@ -93,11 +93,11 @@ router.delete("/:id(\\d+)", async (req, res) => {
   }
   try {
     const path = await dao.deletePath(id, user_id);
-    if(!path) {
+    if (!path) {
       return res.status(404).end();
     }
     return res.json(path);
-  } catch (err) {
+  } catch {
     return res.status(500).end();
   }
 });
